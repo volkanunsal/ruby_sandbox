@@ -1,23 +1,3 @@
-=begin
-
-This file is part of the shikashi project, http://github.com/tario/shikashi
-
-Copyright (c) 2009-2010 Roberto Dario Seminara <robertodarioseminara@gmail.com>
-
-shikashi is free software: you can redistribute it and/or modify
-it under the terms of the gnu general public license as published by
-the free software foundation, either version 3 of the license, or
-(at your option) any later version.
-
-shikashi is distributed in the hope that it will be useful,
-but without any warranty; without even the implied warranty of
-merchantability or fitness for a particular purpose.  see the
-gnu general public license for more details.
-
-you should have received a copy of the gnu general public license
-along with shikashi.  if not, see <http://www.gnu.org/licenses/>.
-
-=end
 require "rubygems"
 require "evalhook"
 require "shikashi/privileges"
@@ -32,54 +12,47 @@ module Shikashi
   end
 
   module Timeout
-
-
     #raised when reach the timeout in a script execution restricted by timeout (see Sandbox#run)
     class Error < Exception
-
     end
   end
 
-#The sandbox class run the sandbox, because of internal behaviour only can be use one instance
-#of sandbox by thread (each different thread may have its own sandbox running in the same time)
-#
-#= Example
-#
-# require "rubygems"
-# require "shikashi"
-#
-# include Shikashi
-#
-# s = Sandbox.new
-# priv = Privileges.new
-# priv.allow_method :print
-#
-# s.run(priv, 'print "hello world\n"')
-#
+  # The sandbox class runs the sandbox. Only one instance of sandbox can be defined
+  # per thread (each thread may have its own sandbox running.)
+  #
+  #= Example
+  #
+  # require "rubygems"
+  # require "shikashi"
+  #
+  # include Shikashi
+  #
+  # s = Sandbox.new
+  # priv = Privileges.new
+  # priv.allow_method :print
+  #
+  # s.run(priv, 'print "hello world\n"')
+  #
   class Sandbox
 
-#array of privileges of restricted code within sandbox
-#
-#Example
-# sandbox.privileges[source].allow_method :raise
-#
+    #array of privileges of restricted code within sandbox
+    #
+    #Example
+    # sandbox.privileges[source].allow_method :raise
+    #
     attr_reader :privileges
-#Binding of execution, the default is a binding in a global context allowing the definition of module of classes
+
+    #Binding of execution, the default is a binding in a global context allowing the definition of module of classes
     attr_reader :chain
 
     attr_reader :hook_handler
 
-#
-#   Same as Sandbox.new.run
-#
-
+    # Same as Sandbox.new.run
     def self.run(*args)
       Sandbox.new.run(Shikashi.global_binding, *args)
     end
-#
-# Generate a random source file name for the sandbox, used internally
-#
 
+    # Generate a random source file name for the sandbox, used internally
     def generate_id
       "sandbox-#{rand(1000000)}"
     end
@@ -94,7 +67,7 @@ module Shikashi
       @hook_handler.base_namespace = @base_namespace
     end
 
-# add a chain of sources, used internally
+    # add a chain of sources, used internally
     def add_source_chain(outer, inner)
       @chain[inner] = outer
     end
@@ -149,7 +122,7 @@ module Shikashi
         privileges = sandbox.privileges[source]
         if privileges
           unless privileges.xstr_allowed?
-            raise SecurityError, "fobidden shell commands"
+            raise SecurityError, "forbidden shell commands"
           end
         end
 
@@ -238,7 +211,7 @@ module Shikashi
             unless privileges then
                raise SecurityError.new("Cannot invoke method #{method_name} on object of class #{klass}")
             else
-#              privileges = privileges.dup
+              # privileges = privileges.dup
               loop_source = source
               loop_privileges = privileges
 
@@ -268,15 +241,16 @@ module Shikashi
         end
 
 
-      end # if
+      end
 
       def get_caller
         caller[2].split(":").first
       end
-    end # Class
+    end
 
-    #Run the code in sandbox with the given privileges
-    # (see examples)
+    # Run the code in sandbox with the given privileges
+    #
+    #   (see examples)
     #
     # Arguments
     #
@@ -333,17 +307,15 @@ module Shikashi
     # sandbox.run('
     #   def self.foo
     #     print "hello world\n"
-    #   end
-    #    ', :privileges => privileges)
-    #
+    #   end', :privileges => privileges)
     #
     def run(*args)
       run_i(*args)
     end
 
-    #Creates a packet of code with the given privileges to execute later as many times as neccessary
+    # Creates a packet of code with the given privileges to execute later as many times as neccessary
     #
-    # (see examples)
+    #   (see examples)
     #
     # Arguments
     #
@@ -433,6 +405,7 @@ module Shikashi
     def dispose
       @hook_handler_list.each(&:dispose)
     end
+
 private
 
     def instantiate_evalhook_handler
@@ -450,7 +423,6 @@ private
     end
 
     def run_i(*args)
-
       t = args.pick(:timeout) do nil end
       raise Shikashi::Timeout::Error if t == 0
       t = t || 0
@@ -459,10 +431,10 @@ private
         yield
       else
         begin
-          timeout t do
-            privileges_ = args.pick(Privileges,:privileges) do Privileges.new end
-            code = args.pick(String,:code)
-            binding_ = args.pick(Binding,:binding) do Shikashi.global_binding end
+          ::Timeout.timeout t do
+            privileges_ = args.pick(Privileges, :privileges) do Privileges.new end
+            code = args.pick(String, :code)
+            binding_ = args.pick(Binding, :binding) do Shikashi.global_binding end
             source = args.pick(:source) do generate_id end
             base_namespace = args.pick(:base_namespace) do nil end
             no_base_namespace = args.pick(:no_base_namespace) do @no_base_namespace end
@@ -511,10 +483,7 @@ private
         nil
       end
     end
-
   end
 end
 
 Shikashi.global_binding = binding()
-
-

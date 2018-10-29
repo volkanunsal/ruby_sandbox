@@ -5,8 +5,8 @@ require "shikashi"
 
 include Shikashi
 
-priv = Privileges.allow_method(:print).allow_global_write(:$a)
-Sandbox.run(priv,
+priv = Shikashi::Privileges.allow_method(:print).allow_global_write(:$a)
+Shikashi::Sandbox.run(priv,
 '
 $a = 9
 print "assigned 9 to $a\n"

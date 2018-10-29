@@ -1,0 +1,41 @@
+PATH
+  remote: .
+  specs:
+    shikashi (0.6.0)
+      evalhook (>= 0.6.0)
+      getsource (>= 0.1.0)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    coderay (1.1.2)
+    evalhook (0.6.0)
+      partialruby (~> 0.3)
+      sexp_processor (~> 4.0)
+    getsource (0.2.2)
+    method_source (0.9.0)
+    partialruby (0.3.0)
+      ruby2ruby (~> 2)
+      ruby_parser (~> 3)
+    pry (0.11.3)
+      coderay (~> 1.1.0)
+      method_source (~> 0.9.0)
+    rake (10.4.2)
+    ruby2ruby (2.4.1)
+      ruby_parser (~> 3.1)
+      sexp_processor (~> 4.6)
+    ruby_parser (3.11.0)
+      sexp_processor (~> 4.9)
+    sexp_processor (4.11.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  bundler (~> 1.15)
+  pry (~> 0.11)
+  rake (~> 10.0)
+  shikashi!
+
+BUNDLED WITH
+   1.15.2

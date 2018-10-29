@@ -3,10 +3,8 @@
 require "rubygems"
 require "shikashi"
 
-include Shikashi
-
-s = Sandbox.new
-priv = Privileges.new
+s = Shikashi::Sandbox.new
+priv = Shikashi::Privileges.new
 priv.allow_method :print
 
 s.run(priv, 'print "hello world\n"')

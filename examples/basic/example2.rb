@@ -3,15 +3,13 @@
 require "rubygems"
 require "shikashi"
 
-include Shikashi
-
 def foo
 	# privileged code, can do any operation
 	print "foo\n"
 end
 
-s = Sandbox.new
-priv = Privileges.new
+s = Shikashi::Sandbox.new
+priv = Shikashi::Privileges.new
 
 # allow execution of foo in this object
 priv.object(self).allow :foo
