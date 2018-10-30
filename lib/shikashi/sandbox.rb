@@ -137,12 +137,10 @@ module Shikashi
       if block_given?
         yield
       else
-        begin
-          ::Timeout.timeout(t) { run_i(*args) }
-        rescue ::Timeout::Error
-          raise Shikashi::Timeout::Error
-        end
+        ::Timeout.timeout(t) { run_i(*args) }
       end
+    rescue ::Timeout::Error
+      raise Shikashi::Timeout::Error
     end
 
     def run_i(*args)
@@ -238,9 +236,8 @@ module Shikashi
 
       [code, hook_handler, source, privileges_]
     end
-
     # rubocop:enable Metrics/AbcSize
-    #
+
     def inst_hook_handler(base_namespace)
       hook_handler = instantiate_evalhook_handler
       hook_handler.base_namespace = base_namespace

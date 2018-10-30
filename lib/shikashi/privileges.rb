@@ -1,5 +1,5 @@
 require 'find'
-require_relative './allowed_methods'
+require 'shikashi/allower'
 
 module Shikashi
   # rubocop:disable Metrics/ClassLength
@@ -8,8 +8,8 @@ module Shikashi
   #
   class Privileges
     def initialize
+      # Allowed
       @allowed_objects = {}
-      @allowed_kinds = {}
       @allowed_classes = {}
       @allowed_instances = {}
       @allowed_methods = []
@@ -18,6 +18,8 @@ module Shikashi
       @allowed_read_consts = []
       @allowed_write_globals = []
       @allowed_write_consts = []
+      # Disallowed
+      @disallowed_methods = []
       @whitelist_mode = true
     end
 
@@ -49,23 +51,24 @@ module Shikashi
     #   privileges.object(Hash).allow :new
     #
     def object(obj)
-      hash_entry(@allowed_objects, obj.object_id)
+      build_allower(@allowed_objects, obj.object_id)
     end
 
     #
     # Specifies the methods allowed for the instances of a class
     #
-    # Example 1:
-    #   privileges.instances_of(Array).allow :each # allow calls of methods named "each" over instances of Array
+    # Examples:
+    #   # allow calls of methods named "each" over instances of Array
+    #   privileges.instances_of(Array).allow :each
     #
-    # Example 2:
-    #   privileges.instances_of(Array).allow :select, map # allow calls of methods named "each" and "map" over instances of Array
+    #   # allow calls of methods named "each" and "map" over instances of Array
+    #   privileges.instances_of(Array).allow :select, map
     #
-    # Example 3:
-    #   privileges.instances_of(Hash).allow_all # allow any method call over instances of Hash
+    #   # allow any method call over instances of Hash
+    #   privileges.instances_of(Hash).allow_all
     #
     def instances_of(klass)
-      hash_entry(@allowed_instances, klass.object_id)
+      build_allower(@allowed_instances, klass.object_id)
     end
 
     #
@@ -90,7 +93,7 @@ module Shikashi
     # ...
     #
     def methods_of(klass)
-      hash_entry(@allowed_klass_methods, klass.object_id)
+      build_allower(@allowed_klass_methods, klass.object_id)
     end
 
     # allow the execution of method named method_name wherever
@@ -103,94 +106,22 @@ module Shikashi
       self
     end
 
+    # disallow the execution of method named method_name wherever
+    #
+    # Example:
+    #   privileges.disallow_method(:foo)
+    #
+    def disallow_method(method_name)
+      @disallowed_methods << method_name.to_sym
+      self
+    end
+
     def allow?(klass, recv, method_name, method_id)
       if whitelist_mode?
         whitelisted?(klass, recv, method_name, method_id)
       else
         !blacklisted?(klass, recv, method_name, method_id)
       end
-    end
-
-    def whitelist_mode?
-      @whitelist_mode
-    end
-
-    def blacklisted?(_klass, _recv, _method_name, _method_id)
-      false
-    end
-
-    def whitelisted?(klass, recv, method_name, _method_id)
-      @allowed_methods.include?(method_name) ||
-        allows_obj(recv, method_name) ||
-        allows_klass_methods(klass, method_name) ||
-        allows_klasses(recv, method_name) ||
-        allows_kinds(recv, method_name) ||
-        allows_instances(recv, method_name)
-    rescue StandardError => e
-      print "ERROR: #{e}\n"
-      print e.backtrace.join("\n")
-      false
-    end
-
-    def allows_obj(recv, method_name)
-      id = recv.object_id
-      tmp = @allowed_objects[id]
-      return unless tmp && tmp.allowed?(method_name)
-
-      @last_allowed = tmp
-      true
-    end
-
-    def allows_klass_methods(klass, method_name)
-      method = klass.instance_method(method_name) if method_name
-      return unless method
-
-      tmp = @allowed_klass_methods[method.owner.object_id]
-      return unless tmp && tmp.allowed?(method_name)
-
-      @last_allowed = tmp
-      true
-    end
-
-    def allows_klasses(last_class, method_name)
-      return unless last_class.instance_of?(Class)
-
-      loop do
-        return true if allows_instance_methods(last_class, method_name)
-        break if last_class.nil? || last_class == Object
-
-        last_class = last_class.superclass
-      end
-    end
-
-    def allows_instance_methods(last_class, method_name)
-      tmp = @allowed_classes[last_class.object_id]
-      return unless tmp && tmp.allowed?(method_name)
-
-      @last_allowed = tmp
-      true
-    end
-
-    def allows_kinds(recv, method_name)
-      last_class = recv.class
-      loop do
-        tmp = @allowed_kinds[last_class.object_id]
-        if tmp && tmp.allowed?(method_name)
-          @last_allowed = tmp
-          return true
-        end
-        break if last_class.nil? || last_class == Object
-
-        last_class = last_class.superclass
-      end
-    end
-
-    def allows_instances(recv, method_name)
-      tmp = @allowed_instances[recv.class.object_id]
-      return unless tmp && tmp.allowed?(method_name)
-
-      @last_allowed = tmp
-      true
     end
 
     def xstr_allowed?
@@ -355,13 +286,94 @@ module Shikashi
 
     private
 
-    def hash_entry(hash, key)
-      tmp = hash[key]
-      unless tmp
-        tmp = AllowedMethods.new(self)
-        hash[key] = tmp
+    def whitelist_mode?
+      @whitelist_mode
+    end
+
+    def blacklisted?(_klass, _recv, method_name, _method_id)
+      # TODO: add check for instance methods of
+      # TODO: add check for klass of
+      # TODO: add check for instance
+      disallows_method?(method_name)
+    end
+
+    def whitelisted?(klass, recv, method_name, _method_id)
+      allows_method?(method_name) ||
+        allows_method_on_obj?(recv, method_name) ||
+        allows_instance_methods_of?(klass, method_name) ||
+        allows_klass_or_superclasses_of?(klass, method_name) ||
+        allows_instance_of?(recv, method_name)
+    rescue StandardError => e
+      print "ERROR: #{e}\n"
+      print e.backtrace.join("\n")
+      false
+    end
+
+    def allows_method?(method_name)
+      @allowed_methods.include?(method_name)
+    end
+
+    def disallows_method?(method_name)
+      @disallowed_methods.include?(method_name)
+    end
+
+    def allows_method_on_obj?(recv, method_name)
+      id = recv.object_id
+      allower = @allowed_objects[id]
+      check_allower(allower, method_name)
+    end
+
+    def allows_instance_methods_of?(klass, method_name)
+      # Find method in the instance methods of class.
+      method = klass.instance_method(method_name) if method_name
+      # Not found. Return nil.
+      return unless method
+
+      # Check if method's owner, i.e. class, is in allowed
+      # klass methods
+      allower = @allowed_klass_methods[method.owner.object_id]
+      check_allower(allower, method_name)
+    end
+
+    # TODO: test
+    #
+    # Is this supposed to receive a klass or a receiver?
+    #
+    def allows_klass_or_superclasses_of?(klass, method_name)
+      return unless klass.instance_of?(Class)
+
+      loop do
+        return true if allows_klass_of?(klass, method_name)
+        break if klass.nil? || klass == Object
+
+        klass = klass.superclass
       end
-      tmp
+    end
+
+    def allows_klass_of?(klass, method_name)
+      allower = @allowed_classes[klass.object_id]
+      check_allower(allower, method_name)
+    end
+
+    def allows_instance_of?(recv, method_name)
+      allower = @allowed_instances[recv.class.object_id]
+      check_allower(allower, method_name)
+    end
+
+    def check_allower(allower, method_name)
+      return unless allower && allower.allowed?(method_name)
+
+      @last_allowed = allower
+      true
+    end
+
+    def build_allower(hash, key)
+      allower = hash[key]
+      unless allower
+        allower = Allower.new(self)
+        hash[key] = allower
+      end
+      allower
     end
   end
   # rubocop:enable Metrics/ClassLength
