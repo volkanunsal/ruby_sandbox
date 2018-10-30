@@ -1,0 +1,24 @@
+AllCops:
+  Exclude:
+    - 'examples/**/*'
+    - 'bin/**/*'
+    - 'spec/**/*'
+
+Security/Eval:
+  Enabled: false
+Metrics/PerceivedComplexity:
+  Enabled: false
+Metrics/CyclomaticComplexity:
+  Enabled: false
+Naming/AccessorMethodName:
+  Enabled: false
+Metrics/LineLength:
+  Max: 2079
+Metrics/MethodLength:
+  Max: 2079
+Lint/UnifiedInteger:
+  Enabled: false
+Style/NumericPredicate:
+  Enabled: false
+Style/EvalWithLocation:
+  Enabled: false

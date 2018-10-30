@@ -1,7 +1,7 @@
 # define a class from inside the sandbox and use it from outside
 
-require "rubygems"
-require "shikashi"
+require 'rubygems'
+require 'shikashi'
 
 s = Shikashi::Sandbox.new
 priv = Shikashi::Privileges.new
@@ -12,7 +12,7 @@ priv.allow_method :print
 # allow definition of classes
 priv.allow_class_definitions
 
-#inside the sandbox, only can use method foo on main and method times on instances of Fixnum
+# inside the sandbox, only can use method foo on main and method times on instances of Fixnum
 s.run(priv, '
 class X
 	def foo
@@ -29,8 +29,7 @@ end
 x = s.base_namespace::X.new
 x.foo
 begin
-	x.bar
+  x.bar
 rescue SecurityError => e
-	print "x.bar failed due security errors: #{e}\n"
+  print "x.bar failed due security errors: #{e}\n"
 end
-

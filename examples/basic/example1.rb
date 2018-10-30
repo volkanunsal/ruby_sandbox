@@ -1,7 +1,7 @@
 # "hello world" from within the sandbox
 
-require "rubygems"
-require "shikashi"
+require 'rubygems'
+require 'shikashi'
 
 s = Shikashi::Sandbox.new
 priv = Shikashi::Privileges.new

@@ -1,4 +1,2 @@
-require "shikashi/version"
-require "shikashi/sandbox"
-
-
+require 'shikashi/version'
+require 'shikashi/sandbox'

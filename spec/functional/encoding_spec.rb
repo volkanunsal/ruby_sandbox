@@ -1,39 +1,38 @@
-# encoding: utf-8
-require "test/unit"
-require "shikashi"
+require 'spec_helper'
 
 include Shikashi
 
-describe Sandbox, "Shikashi sandbox" do
-  it "Should accept UTF-8 encoding via ruby header comments" do
-    Sandbox.new.run("# encoding: utf-8\n'кириллица'").should be == 'кириллица'
+describe Sandbox, 'Shikashi sandbox' do
+
+  it 'should accept UTF-8 encoding via ruby header comments' do
+    expect(Sandbox.new.run("# encoding: utf-8\n'кириллица'")).to be == 'кириллица'
   end
 
-  it "Should accept UTF-8 encoding via sandbox run options" do
-    Sandbox.new.run("'кириллица'", :encoding => "utf-8").should be == 'кириллица'
+  it 'should accept UTF-8 encoding via sandbox run options' do
+    expect(Sandbox.new.run("'кириллица'", encoding: 'utf-8')).to be == 'кириллица'
   end
 
-  it "Should accept UTF-8 encoding via ruby header comments" do
-    Sandbox.new.run("# encoding:        utf-8\n'кириллица'").should be == 'кириллица'
+  it 'should accept UTF-8 encoding via ruby header comments' do
+    expect(Sandbox.new.run("# encoding:        utf-8\n'кириллица'")).to be == 'кириллица'
   end
 
-  it "Should accept UTF-8 encoding via ruby header comments" do
-    Sandbox.new.run("#        encoding: utf-8\n'кириллица'").should be == 'кириллица'
+  it 'should accept UTF-8 encoding via ruby header comments' do
+    expect(Sandbox.new.run("#        encoding: utf-8\n'кириллица'")).to be == 'кириллица'
   end
 
-  it "Should accept UTF-8 encoding via ruby header comments" do
-    Sandbox.new.packet("# encoding: utf-8\n'кириллица'").run.should be == 'кириллица'
+  it 'should accept UTF-8 encoding via ruby header comments' do
+    expect(Sandbox.new.packet("# encoding: utf-8\n'кириллица'").run).to be == 'кириллица'
   end
 
-  it "Should accept UTF-8 encoding via sandbox run options" do
-    Sandbox.new.packet("'кириллица'", :encoding => "utf-8").run.should be == 'кириллица'
+  it 'should accept UTF-8 encoding via sandbox run options' do
+    expect(Sandbox.new.packet("'кириллица'", encoding: 'utf-8').run).to be == 'кириллица'
   end
 
-  it "Should accept UTF-8 encoding via ruby header comments" do
-    Sandbox.new.packet("# encoding:        utf-8\n'кириллица'").run.should be == 'кириллица'
+  it 'should accept UTF-8 encoding via ruby header comments' do
+    expect(Sandbox.new.packet("# encoding:        utf-8\n'кириллица'").run).to be == 'кириллица'
   end
 
-  it "Should accept UTF-8 encoding via ruby header comments" do
-    Sandbox.new.packet("#        encoding: utf-8\n'кириллица'").run.should be == 'кириллица'
+  it 'should accept UTF-8 encoding via ruby header comments' do
+    expect(Sandbox.new.packet("#        encoding: utf-8\n'кириллица'").run).to be == 'кириллица'
   end
 end
