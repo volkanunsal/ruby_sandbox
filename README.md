@@ -20,7 +20,7 @@ Hello world from a sandbox
 
 ```ruby
   s = RubySandbox.new
-  priv = RubySandbox.build(:whitelist)
+  priv = RubySandbox.whitelist
   priv.rule { allow_method(:print) }
 
   s.run(priv, 'print "hello world\n"')

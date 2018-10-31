@@ -7,11 +7,21 @@ require 'ruby_sandbox/sandbox'
 
 # RubySandbox is a wrapper for Sandbox.
 module RubySandbox
-  def self.new
+  extend self
+
+  def new
     Sandbox.new
   end
 
-  def self.build(strategy = :blacklist)
+  def whitelist
+    build(:whitelist)
+  end
+
+  def blacklist
+    build
+  end
+
+  def build(strategy = :blacklist)
     case strategy
     when :whitelist
       Whitelist.new
