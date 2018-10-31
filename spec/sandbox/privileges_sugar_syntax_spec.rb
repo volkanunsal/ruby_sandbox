@@ -54,7 +54,7 @@ describe Privileges, 'Shikashi::Privileges' do
 
   it 'should chain one allow_method' do
     priv = Privileges.allow_method(:to_s)
-    expect(priv.allow?(Fixnum, 4, :to_s, 0)).to be == true
+    expect(priv.allow?(Fixnum, 4, :to_s)).to be == true
   end
 
   it 'should chain one allow_method and one allow_global' do
@@ -62,7 +62,7 @@ describe Privileges, 'Shikashi::Privileges' do
            .allow_method(:to_s)
            .allow_global_read(:$a)
 
-    expect(priv.allow?(Fixnum, 4, :to_s, 0)).to be == true
+    expect(priv.allow?(Fixnum, 4, :to_s)).to be == true
     expect(priv.global_read_allowed?(:$a)).to be == true
   end
 
@@ -70,13 +70,13 @@ describe Privileges, 'Shikashi::Privileges' do
   it 'should allow + method (as string)' do
     priv = Privileges.new
     priv.allow_method('+')
-    expect(priv.allow?(Fixnum, 4, :+, 0)).to be == true
+    expect(priv.allow?(Fixnum, 4, :+)).to be == true
   end
 
   it 'should allow + method (as symbol)' do
     priv = Privileges.new
     priv.allow_method(:+)
-    expect(priv.allow?(Fixnum, 4, :+, 0)).to be == true
+    expect(priv.allow?(Fixnum, 4, :+)).to be == true
   end
 
   it 'should allow $a global read (as string)' do

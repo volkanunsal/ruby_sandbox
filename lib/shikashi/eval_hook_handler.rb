@@ -98,7 +98,7 @@ module Shikashi
       privileges = sandbox.privileges[source]
       while privileges && (source != dest_source)
         msg = "Cannot invoke method #{method_name} on object of class #{klass}"
-        can_loop = privileges.allow?(klass, recv, method_name, nil)
+        can_loop = privileges.allow?(klass, recv, method_name)
         raise SecurityError, msg unless can_loop
 
         source = sandbox.chain[source]

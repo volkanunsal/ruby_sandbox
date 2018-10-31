@@ -1,6 +1,7 @@
 require 'evalhook'
 require 'getsource'
 require 'timeout'
+require 'shikashi/privileges_base'
 require 'shikashi/privileges'
 require 'shikashi/eval_hook_handler'
 require 'shikashi/sandbox/packet'
