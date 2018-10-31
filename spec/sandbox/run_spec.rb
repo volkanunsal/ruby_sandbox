@@ -4,7 +4,7 @@ include Shikashi
 
 $top_level_binding = binding
 
-describe Sandbox, 'Shikashi sandbox' do
+describe 'Sandbox#run' do
   it 'should run empty code without privileges' do
     Sandbox.new.run ''
   end

@@ -3,12 +3,12 @@ require 'evalhook'
 
 include Shikashi
 
-describe Sandbox, 'Shikashi sandbox hook handler' do
-  it 'should be obtainable from sandbox' do
+describe 'Sandbox#hook_handler' do
+  it 'be obtainable from sandbox' do
     Sandbox.new.hook_handler
   end
 
-  it 'should be obtainable from sandbox through create_hook_handler' do
+  it 'be obtainable from sandbox through create_hook_handler' do
     sandbox = Sandbox.new
     hook_handler = sandbox.create_hook_handler
     expect(hook_handler).to be_kind_of(EvalHook::HookHandler)
@@ -17,7 +17,7 @@ describe Sandbox, 'Shikashi sandbox hook handler' do
   class X
     def foo; end
   end
-  it 'should raise SecurityError when handle calls without privileges' do
+  it 'raises SecurityError when handle calls without privileges' do
     sandbox = Sandbox.new
     hook_handler = sandbox.create_hook_handler
 
@@ -27,7 +27,7 @@ describe Sandbox, 'Shikashi sandbox hook handler' do
     end.to raise_error(SecurityError)
   end
 
-  it 'should not raise SecurityError with method privileges' do
+  it 'does not raise SecurityError with method privileges' do
     sandbox = Sandbox.new
     priv = Whitelist.new
     priv.allow_method(:foo)
@@ -44,7 +44,7 @@ describe Sandbox, 'Shikashi sandbox hook handler' do
     end.to_not raise_error
   end
 
-  it 'should raise SecurityError with handle_gasgn without privileges' do
+  it 'raises SecurityError with handle_gasgn without privileges' do
     sandbox = Sandbox.new
 
     hook_handler = sandbox.create_hook_handler(source: 'test-source')
@@ -58,7 +58,7 @@ describe Sandbox, 'Shikashi sandbox hook handler' do
     end.to raise_error(SecurityError)
   end
 
-  it 'should not raise SecurityError with handle_gasgn with privileges' do
+  it 'does not raise SecurityError with handle_gasgn with privileges' do
     sandbox = Sandbox.new
     privileges = Whitelist.new
 
@@ -75,7 +75,7 @@ describe Sandbox, 'Shikashi sandbox hook handler' do
     end.to_not raise_error
   end
 
-  it 'should raise SecurityError with handle_cdecl without privileges' do
+  it 'raises SecurityError with handle_cdecl without privileges' do
     sandbox = Sandbox.new
 
     hook_handler = sandbox.create_hook_handler(source: 'test-source')
@@ -89,7 +89,7 @@ describe Sandbox, 'Shikashi sandbox hook handler' do
     end.to raise_error(SecurityError)
   end
 
-  it 'should not raise SecurityError with handle_cdecl with privileges' do
+  it 'does not raise SecurityError with handle_cdecl with privileges' do
     sandbox = Sandbox.new
     privileges = Whitelist.new
 
@@ -106,7 +106,7 @@ describe Sandbox, 'Shikashi sandbox hook handler' do
     end.to_not raise_error
   end
 
-  it 'should raise SecurityError with handle_gvar without privileges' do
+  it 'raises SecurityError with handle_gvar without privileges' do
     sandbox = Sandbox.new
 
     hook_handler = sandbox.create_hook_handler(source: 'test-source')
@@ -120,7 +120,7 @@ describe Sandbox, 'Shikashi sandbox hook handler' do
     end.to raise_error(SecurityError)
   end
 
-  it 'should not raise SecurityError with handle_gasgn with privileges' do
+  it 'does not raise SecurityError with handle_gasgn with privileges' do
     sandbox = Sandbox.new
     privileges = Whitelist.new
 
@@ -137,7 +137,7 @@ describe Sandbox, 'Shikashi sandbox hook handler' do
     end.to_not raise_error
   end
 
-  it 'should raise SecurityError with handle_const without privileges' do
+  it 'raises SecurityError with handle_const without privileges' do
     sandbox = Sandbox.new
 
     hook_handler = sandbox.create_hook_handler(source: 'test-source')
@@ -151,7 +151,7 @@ describe Sandbox, 'Shikashi sandbox hook handler' do
     end.to raise_error(SecurityError)
   end
 
-  it 'should not raise SecurityError with handle_cdecl with privileges' do
+  it 'does not raise SecurityError with handle_cdecl with privileges' do
     sandbox = Sandbox.new
     privileges = Whitelist.new
 
