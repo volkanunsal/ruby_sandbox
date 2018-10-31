@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-include Shikashi
+include RubySandbox
 
 describe 'Blacklist' do
   describe '#disallow_method' do

@@ -1,9 +1,9 @@
 require 'spec_helper'
 
-describe Shikashi do
+describe RubySandbox do
   describe '#new' do
     subject { described_class.new }
-    it { is_expected.to be_kind_of(Shikashi::Sandbox) }
+    it { is_expected.to be_kind_of(RubySandbox::Sandbox) }
   end
 
   describe '#build' do
@@ -13,7 +13,7 @@ describe Shikashi do
 
     describe 'args: whitelist' do
       let(:args) { :whitelist }
-      it { is_expected.to be_kind_of(Shikashi::Whitelist) }
+      it { is_expected.to be_kind_of(RubySandbox::Whitelist) }
     end
   end
 end

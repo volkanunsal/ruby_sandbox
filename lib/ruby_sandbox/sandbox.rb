@@ -1,12 +1,12 @@
 require 'evalhook'
 require 'getsource'
 require 'timeout'
-require 'shikashi/whitelist'
-require 'shikashi/eval_hook_handler'
-require 'shikashi/sandbox/packet'
+require 'ruby_sandbox/whitelist'
+require 'ruby_sandbox/eval_hook_handler'
+require 'ruby_sandbox/sandbox/packet'
 
-# Shikashi is the module namespace
-module Shikashi
+# RubySandbox is the module namespace
+module RubySandbox
   class << self
     attr_accessor :global_binding
   end
@@ -23,10 +23,7 @@ module Shikashi
   #
   #= Example
   #
-  # require "rubygems"
-  # require "shikashi"
-  #
-  # include Shikashi
+  # include RubySandbox
   #
   # s = Sandbox.new
   # priv = Whitelist.new
@@ -55,7 +52,7 @@ module Shikashi
     # :code       Mandatory argument of class String with the code to execute
     #             restricted in the sandbox
     #
-    # :privileges Optional argument of class Shikashi::Sandbox::Whitelist to
+    # :privileges Optional argument of class RubySandbox::Sandbox::Whitelist to
     #             indicate the restrictions of the code executed in the sandbox.
     #             The default is an empty Whitelist (absolutly no permission.)
     #             Must be of class Whitelist or passed as hash_key
@@ -70,7 +67,7 @@ module Shikashi
     #
     # :timeout   Optional argument to restrict the execution time of the script
     #            to a given value in seconds. (Accepts integer and decimal values),
-    #            when timeout hits Shikashi::Timeout::Error is raised.
+    #            when timeout hits RubySandbox::Timeout::Error is raised.
     #
     # :base_namespace   Alternate module to contain all classes and constants
     #                   defined by the unprivileged code if not specified, by
@@ -96,10 +93,7 @@ module Shikashi
     #
     # Example:
     #
-    # require "rubygems"
-    # require "shikashi"
-    #
-    # include Shikashi
+    # include RubySandbox
     #
     # sandbox = Sandbox.new
     # privileges = Whitelist.new
@@ -107,10 +101,7 @@ module Shikashi
     # sandbox.run('print "hello world\n"', :privileges => privileges)
     #
     # Example 2:
-    # require "rubygems"
-    # require "shikashi"
-    #
-    # include Shikashi
+    # include RubySandbox
     #
     # sandbox = Sandbox.new
     # privileges = Whitelist.new
@@ -125,7 +116,7 @@ module Shikashi
     def run(*args)
       opts = Argument.new(args)
       t = opts.pick(:timeout) { nil }
-      raise Shikashi::Timeout::Error if t == 0
+      raise RubySandbox::Timeout::Error if t == 0
 
       t ||= 0
 
@@ -135,12 +126,12 @@ module Shikashi
         ::Timeout.timeout(t) { run_i(*args) }
       end
     rescue ::Timeout::Error
-      raise Shikashi::Timeout::Error
+      raise RubySandbox::Timeout::Error
     end
 
     def run_i(*args)
       opts = Argument.new(args)
-      binding_ = opts.pick(Binding, :binding) { Shikashi.global_binding }
+      binding_ = opts.pick(Binding, :binding) { RubySandbox.global_binding }
       code, hook_handler, source = prepare_code(*args)
       hook_handler.evalhook(code, binding_, source)
     end
@@ -165,7 +156,7 @@ module Shikashi
     # :code             Mandatory argument of class String with the code to
     #                   execute restricted in the sandbox
     #
-    # :privileges       Optional argument of class Shikashi::Sandbox::Whitelist
+    # :privileges       Optional argument of class RubySandbox::Sandbox::Whitelist
     #                   to indicate the restrictions of the code executed in
     #                   the sandbox. The default is an empty Whitelist (absolutely
     #                   no permission.) Must be of class Whitelist or passed
@@ -188,14 +179,11 @@ module Shikashi
     #                   normal source file.
     #
     # NOTE: arguments are the same as for Sandbox#run method, except for timeout
-    # and binding which can be used when calling Shikashi::Sandbox::Packet#run.
+    # and binding which can be used when calling RubySandbox::Sandbox::Packet#run.
     #
     # Example:
     #
-    # require "rubygems"
-    # require "shikashi"
-    #
-    # include Shikashi
+    # include RubySandbox
     #
     # sandbox = Sandbox.new
     #
@@ -208,7 +196,7 @@ module Shikashi
     def packet(*args)
       code, _hook_handler, source, privileges_ = prepare_code(*args)
       evalhook_packet = @hook_handler.packet(code)
-      Shikashi::Sandbox::Packet.new(evalhook_packet, privileges_, source)
+      RubySandbox::Sandbox::Packet.new(evalhook_packet, privileges_, source)
     end
 
     # rubocop:disable Metrics/AbcSize
@@ -295,8 +283,8 @@ module Shikashi
     def create_adhoc_base_namespace
       rnd_module_name = "SandboxBasenamespace#{rand(100_000_000)}"
 
-      eval("module Shikashi::Sandbox::#{rnd_module_name}; end")
-      @base_namespace = eval("Shikashi::Sandbox::#{rnd_module_name}")
+      eval("module RubySandbox::Sandbox::#{rnd_module_name}; end")
+      @base_namespace = eval("RubySandbox::Sandbox::#{rnd_module_name}")
       @base_namespace
     end
 
@@ -309,4 +297,4 @@ module Shikashi
   # rubocop:enable Metrics/ClassLength
 end
 
-Shikashi.global_binding = binding
+RubySandbox.global_binding = binding

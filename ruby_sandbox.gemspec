@@ -1,15 +1,14 @@
 lib = File.expand_path('lib', __dir__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'shikashi/version'
+require 'ruby_sandbox/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = 'shikashi'
-  spec.version       = Shikashi::VERSION
+  spec.name          = 'ruby_sandbox'
+  spec.version       = RubySandbox::VERSION
   spec.authors       = ['Dario Seminara', 'Volkan Unsal']
   spec.email         = ['robertodarioseminara@gmail.com', 'spocksplanet@gmail.com']
 
-  spec.summary       = 'shikashi is a ruby sandbox that permits the execution of "unprivileged" scripts by defining the permitted methods and constants the scripts can invoke with a white list logic'
-  spec.homepage      = 'http://github.com/tario/shikashi'
+  spec.summary       = 'ruby_sandbox is a ruby sandbox that permits the execution of "unprivileged" scripts by defining the permitted methods and constants the scripts can invoke with a white list logic'
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
   # to allow pushing to a single host or delete this section to allow pushing to any host.

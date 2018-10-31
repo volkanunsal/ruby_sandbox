@@ -1,4 +1,4 @@
-module Shikashi
+module RubySandbox
   # Blacklist class provides methods to blacklist methods, classes
   # and class instances.
   class Blacklist < Permissions

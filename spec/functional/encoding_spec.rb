@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-include Shikashi
+include RubySandbox
 
-describe Sandbox, 'Shikashi sandbox' do
+describe Sandbox, 'RubySandbox sandbox' do
 
   it 'should accept UTF-8 encoding via ruby header comments' do
     expect(Sandbox.new.run("# encoding: utf-8\n'кириллица'")).to be == 'кириллица'

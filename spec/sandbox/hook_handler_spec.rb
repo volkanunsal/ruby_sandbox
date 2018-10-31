@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'evalhook'
 
-include Shikashi
+include RubySandbox
 
 describe 'Sandbox#hook_handler' do
   it 'be obtainable from sandbox' do

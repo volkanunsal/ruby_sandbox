@@ -1,10 +1,10 @@
 # call method defined in sandbox from outside
 
 
-require 'shikashi'
+require 'ruby_sandbox'
 
-s = Shikashi::Sandbox.new
-priv = Shikashi::Whitelist.new
+s = RubySandbox::Sandbox.new
+priv = RubySandbox::Whitelist.new
 
 # allow execution of print
 priv.allow_method :print

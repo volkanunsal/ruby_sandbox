@@ -1,4 +1,4 @@
-module Shikashi
+module RubySandbox
   # Used in Whitelist to store information about specified method permissions
   class Rule
     attr_reader :num_rules

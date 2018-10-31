@@ -1,8 +1,8 @@
   
-require 'shikashi'
+require 'ruby_sandbox'
 require 'benchmark'
 
-s = Shikashi::Sandbox.new
+s = RubySandbox::Sandbox.new
 
 class NilClass
   def foo; end
@@ -16,6 +16,6 @@ Benchmark.bm(7) do |x|
 		}
 		"
 
-    s.run code, Shikashi::Whitelist.allow_method(:times).allow_method(:foo)
+    s.run code, RubySandbox::Whitelist.allow_method(:times).allow_method(:foo)
   end
 end

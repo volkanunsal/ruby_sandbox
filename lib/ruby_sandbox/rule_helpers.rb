@@ -1,4 +1,4 @@
-module Shikashi
+module RubySandbox
   # rubocop:disable_line Style/Documentation
   module RuleHelpers
     protected

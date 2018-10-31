@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'Shikashi::Permissions' do
+describe 'RubySandbox::Permissions' do
   describe '#rule' do
     let(:blk) { proc {} }
     let(:priv) { Permissions.new }

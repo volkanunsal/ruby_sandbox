@@ -1,4 +1,4 @@
-module Shikashi
+module RubySandbox
   # EvalhookHandler extends EvalHook to add handlers for executable strings
   # (xstr), global variable assignment (gasgn) and access (gvar), constant read
   # (const) and assignment (cdecl) and method calls (method).

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-include Shikashi
+include RubySandbox
 
 $top_level_binding = binding
 

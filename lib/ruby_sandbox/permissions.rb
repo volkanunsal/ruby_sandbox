@@ -1,9 +1,9 @@
 require 'find'
-require 'shikashi/rule'
-require 'shikashi/rule_helpers'
+require 'ruby_sandbox/rule'
+require 'ruby_sandbox/rule_helpers'
 
 # rubocop:disable_line Style/Documentation
-module Shikashi
+module RubySandbox
   #
   # The Permissions class represent permissions about methods and objects
   #
@@ -224,7 +224,7 @@ module Shikashi
     # Applies a rule to permissions.
     #
     # Example
-    #   priv = Shikashi.privileges
+    #   priv = RubySandbox.privileges
     #   priv.rule { instances_of(Fixnum).allow_all }
     #
     def rule(&blk)

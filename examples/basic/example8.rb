@@ -1,5 +1,5 @@
   
-require 'shikashi'
+require 'ruby_sandbox'
 
 module SandboxModule
 end
@@ -10,13 +10,13 @@ class X
   end
 end
 
-Shikashi::Sandbox.new.run("
+RubySandbox::Sandbox.new.run("
   class ::X
   	def foo
   		print \"foo defined inside the sandbox\\n\"
   	end
   end
-  ", Shikashi::Whitelist.allow_method(:print), base_namespace: SandboxModule)
+  ", RubySandbox::Whitelist.allow_method(:print), base_namespace: SandboxModule)
 
 x = X.new # X class is not affected by the sandbox (The X Class defined in the sandbox is SandboxModule::X)
 x.foo

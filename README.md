@@ -1,6 +1,6 @@
-# Shikashi - A flexible sandbox for ruby
+# RubySandbox - A flexible sandbox for ruby
 
-Shikashi is an sandbox for ruby that handles all ruby method calls executed in the interpreter to allow or deny
+RubySandbox is an sandbox for ruby that handles all ruby method calls executed in the interpreter to allow or deny
 these calls depending on the receiver object, the method name, the source file from where the call was originated
 and the source file where the called method is implemented.
 
@@ -11,41 +11,9 @@ The implementation of shikashi is written in pure ruby and now implemented based
 
 ## Installation
 
-### Gem installation
-
-Run in the terminal:
-
 ```
 sudo gem install shikashi
 ```
-
-OR
-
-- Download the last version of the gem from http://github.com/tario/shikashi/downloads
-- Install the gem with the following;
-
-```
-sudo gem install shikashi-X.X.X.gem.
-```
-
-### Troubleshooting
-
-```
-ERROR:  While executing gem ... (Gem::DependencyError)
-    Unable to resolve dependencies: ruby2ruby requires sexp_processor (~> 3.0); ruby_parser requires sexp_processor (~> 3.0)
-```
-
-The version of ruby2ruby and ruby_parser required depends on sexp_processor 3.X but for some reason this version of the gem
-is not automatically installed by gem, you can workaround this issue by installing it before using:
-
-```
-gem install sexp_processor --version '~> 3.2'
-```
-
-## Documentation
-
-Full API documentation can be found on:
-http://tario.github.com/shikashi/doc/
 
 ## Usage
 
@@ -56,10 +24,7 @@ This examples and more can be found in examples directory
 Hello world from a sandbox
 
 ```ruby
-  require "rubygems"
-  require "shikashi"
-
-  include Shikashi
+  include RubySandbox
 
   s = Sandbox.new
   priv = Privileges.new
@@ -73,10 +38,7 @@ Hello world from a sandbox
 Call external method from inside the sandbox
 
 ```ruby
-  require "rubygems"
-  require "shikashi"
-
-  include Shikashi
+  include RubySandbox
 
   def foo
     # privileged code, can do any operation
@@ -101,10 +63,7 @@ Call external method from inside the sandbox
 Define a class outside the sandbox and use it in the sandbox
 
 ```ruby
-  require "rubygems"
-  require "shikashi"
-
-  include Shikashi
+  include RubySandbox
 
   s = Sandbox.new
   priv = Privileges.new
@@ -152,10 +111,7 @@ Define a class outside the sandbox and use it in the sandbox
 define a class from inside the sandbox and use it from outside
 
 ```ruby
-  require "rubygems"
-  require "shikashi"
-
-  include Shikashi
+  include RubySandbox
 
   s = Sandbox.new
   priv = Privileges.new
@@ -188,10 +144,7 @@ define a class from inside the sandbox and use it from outside
 ### Base namespace
 
 ```ruby
-  require "rubygems"
-  require "shikashi"
-
-  include Shikashi
+  include RubySandbox
 
   class X
     def foo
@@ -222,15 +175,12 @@ define a class from inside the sandbox and use it from outside
 ### Timeout example
 
 ```ruby
-  require "rubygems"
-  require "shikashi"
-
-  s = Shikashi::Sandbox.new
-  perm = Shikashi::Privileges.new
+  s = RubySandbox::Sandbox.new
+  perm = RubySandbox::Privileges.new
 
   perm.allow_method :sleep
 
-  s.run(perm,"sleep 3", :timeout => 2) # raise Shikashi::Timeout::Error after 2 seconds
+  s.run(perm,"sleep 3", :timeout => 2) # raise RubySandbox::Timeout::Error after 2 seconds
 ```
 
 ## Copying

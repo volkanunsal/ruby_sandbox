@@ -1,12 +1,12 @@
 # "hello world" from within the sandbox
 
 
-require 'shikashi'
+require 'ruby_sandbox'
 
-include Shikashi
+include RubySandbox
 
-priv = Shikashi::Whitelist.allow_method(:print).allow_global_write(:$a)
-Shikashi::Sandbox.run(priv,
+priv = RubySandbox::Whitelist.allow_method(:print).allow_global_write(:$a)
+RubySandbox::Sandbox.run(priv,
                       '
                       $a = 9
                       print "assigned 9 to $a\n"

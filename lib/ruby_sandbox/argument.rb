@@ -1,4 +1,4 @@
-module Shikashi
+module RubySandbox
   # Argument parses arguments to extract values by class or
   # hash key.
   #

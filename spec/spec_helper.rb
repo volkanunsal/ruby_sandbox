@@ -1,4 +1,4 @@
-require 'shikashi'
+require 'ruby_sandbox'
 require 'pry'
 
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration

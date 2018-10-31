@@ -1,15 +1,15 @@
 # call external method from inside the sandbox
 
 
-require 'shikashi'
+require 'ruby_sandbox'
 
 def foo
   # privileged code, can do any operation
   print "foo\n"
 end
 
-s = Shikashi::Sandbox.new
-priv = Shikashi::Whitelist.new
+s = RubySandbox::Sandbox.new
+priv = RubySandbox::Whitelist.new
 
 # allow execution of foo in this object
 priv.object(self).allow :foo

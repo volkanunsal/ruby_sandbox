@@ -1,9 +1,9 @@
 # define a class outside the sandbox and use it in the sandbox
 
 
-require 'shikashi'
+require 'ruby_sandbox'
 
-s = Shikashi::Sandbox.new
+s = RubySandbox::Sandbox.new
 
 class ShikaX
   def foo
@@ -20,11 +20,11 @@ class ShikaX
   end
 end
 
-priv = Shikashi::Whitelist
+priv = RubySandbox::Whitelist
        .allow_method(:print) # allow execution of print
        .object(ShikaX).allow(:new) # allow method new of class ShikaX
        .instances_of(ShikaX).allow(:foo, :bar) # allow instance methods of ShikaX. Note that the method privileged_operations is not allowed
-       .allow_const_read('ShikaX', 'Shikashi::SecurityError') # allow the access of ShikaX constant
+       .allow_const_read('ShikaX', 'RubySandbox::SecurityError') # allow the access of ShikaX constant
 
 # inside the sandbox, only can use method foo on main and method times on instances of Fixnum
 s.run(priv, '

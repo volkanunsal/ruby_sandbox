@@ -1,4 +1,4 @@
-module Shikashi
+module RubySandbox
   class Sandbox
     # Packet class stores an executable code in memory for later use.
     #
@@ -34,7 +34,7 @@ module Shikashi
             @evalhook_packet.run(binding_, @source, 0)
           end
         rescue ::Timeout::Error
-          raise Shikashi::Timeout::Error
+          raise RubySandbox::Timeout::Error
         end
       end
 

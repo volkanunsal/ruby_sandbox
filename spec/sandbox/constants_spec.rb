@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-include Shikashi
+include RubySandbox
 
 describe 'description' do
   it 'allows constant read (as string)' do

@@ -1,4 +1,4 @@
-module Shikashi
+module RubySandbox
   #
   # Whitelist class provides methods to whitelist methods, classes
   # and class instances.
@@ -49,10 +49,10 @@ module Shikashi
 
     # Define singleton methods using instance methods of this class.
     class << self
-      im = (Shikashi::Whitelist.instance_methods - Object.instance_methods)
+      im = (RubySandbox::Whitelist.instance_methods - Object.instance_methods)
       im.each do |mname|
         define_method(mname) do |*args|
-          Shikashi::Whitelist.new.send(mname, *args)
+          RubySandbox::Whitelist.new.send(mname, *args)
         end
       end
     end

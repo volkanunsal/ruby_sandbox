@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-include Shikashi
+include RubySandbox
 
 describe 'Whitelist' do
   describe 'return values' do
