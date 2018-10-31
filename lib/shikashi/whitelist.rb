@@ -67,8 +67,8 @@ module Shikashi
 
     def allows_method_on_obj?(recv, method_name)
       id = recv.object_id
-      allower = @allowed_objects[id]
-      check_allower(allower, method_name)
+      rule = @allowed_objects[id]
+      check_rule(rule, method_name)
     end
 
     def allows_instance_methods_of?(klass, method_name)
@@ -79,8 +79,8 @@ module Shikashi
 
       # Check if method's owner, i.e. class, is in allowed
       # klass methods
-      allower = @allowed_klass_methods[method.owner.object_id]
-      check_allower(allower, method_name)
+      rule = @allowed_klass_methods[method.owner.object_id]
+      check_rule(rule, method_name)
     end
 
     # TODO: test
@@ -99,17 +99,17 @@ module Shikashi
     end
 
     def allows_klass_of?(klass, method_name)
-      allower = @allowed_classes[klass.object_id]
-      check_allower(allower, method_name)
+      rule = @allowed_classes[klass.object_id]
+      check_rule(rule, method_name)
     end
 
     def allows_instance_of?(recv, method_name)
-      allower = @allowed_instances[recv.class.object_id]
-      check_allower(allower, method_name)
+      rule = @allowed_instances[recv.class.object_id]
+      check_rule(rule, method_name)
     end
 
-    def check_allower(allower, method_name)
-      allower && allower.allowed?(method_name)
+    def check_rule(rule, method_name)
+      rule && rule.allowed?(method_name)
     end
 
     # Define singleton methods using instance methods of this class.

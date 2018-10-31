@@ -1,5 +1,5 @@
 require 'find'
-require 'shikashi/allower'
+require 'shikashi/rule'
 
 module Shikashi
   #
@@ -167,7 +167,7 @@ module Shikashi
     #   privileges.object(Hash).allow :new
     #
     def object(obj)
-      build_allower(@allowed_objects, obj.object_id)
+      build_rule(@allowed_objects, obj.object_id)
     end
 
     #
@@ -184,7 +184,7 @@ module Shikashi
     #   privileges.instances_of(Hash).allow_all
     #
     def instances_of(klass)
-      build_allower(@allowed_instances, klass.object_id)
+      build_rule(@allowed_instances, klass.object_id)
     end
 
     #
@@ -209,7 +209,7 @@ module Shikashi
     # ...
     #
     def methods_of(klass)
-      build_allower(@allowed_klass_methods, klass.object_id)
+      build_rule(@allowed_klass_methods, klass.object_id)
     end
 
     # Applies a rule to permissions.
@@ -244,18 +244,18 @@ module Shikashi
         when Array
           rs.each(&count)
         end
-
+        
         s
       end
     end
 
-    def build_allower(hash, key)
-      allower = hash[key]
-      unless allower
-        allower = Allower.new(self)
-        hash[key] = allower
+    def build_rule(hash, key)
+      rule = hash[key]
+      unless rule
+        rule = Rule.new(self)
+        hash[key] = rule
       end
-      allower
+      rule
     end
   end
 end

@@ -1,10 +1,10 @@
 module Shikashi
   # Used in Whitelist to store information about specified method permissions
-  class Allower
+  class Rule
     def initialize(privileges = nil)
       @privileges = privileges
-      @allower = []
-      @disallower = []
+      @rule = []
+      @disrule = []
       @num_rules = 0
       @all = false
       @none = false
@@ -15,33 +15,33 @@ module Shikashi
     # return true if the method named method_name is allowed
     # Example
     #
-    # allower = Allower.new
-    # allower.allowed? :foo # => false
-    # allower.allow :foo
-    # allower.allowed? :foo # => true
-    # allower.allow_all
-    # allower.allowed? :bar # => true
+    # rule = Rule.new
+    # rule.allowed? :foo # => false
+    # rule.allow :foo
+    # rule.allowed? :foo # => true
+    # rule.allow_all
+    # rule.allowed? :bar # => true
     #
     # Whitelist#instance_of, Whitelist#methods_of and Whitelist#object returns the corresponding
-    # instance of Allower
+    # instance of Rule
     def allowed?(method_name)
-      @all || @allower.include?(method_name)
+      @all || @rule.include?(method_name)
     end
 
     # return true if the method named method_name is disallowed
     # Example
     #
-    # allower = Allower.new
-    # allower.disallowed? :foo # => false
-    # allower.disallow :foo
-    # allower.disallowed? :foo # => true
-    # allower.disallow_all
-    # allower.disallowed? :bar # => true
+    # rule = Rule.new
+    # rule.disallowed? :foo # => false
+    # rule.disallow :foo
+    # rule.disallowed? :foo # => true
+    # rule.disallow_all
+    # rule.disallowed? :bar # => true
     #
     # Whitelist#instance_of, Whitelist#methods_of and Whitelist#object returns the corresponding
-    # instance of Allower
+    # instance of Rule
     def disallowed?(method_name)
-      @none || @disallower.include?(method_name)
+      @none || @disrule.include?(method_name)
     end
 
     # --------------- ACTIONS ----------------------
@@ -49,14 +49,14 @@ module Shikashi
     # Specifies that a method or list of methods are allowed
     # Example
     #
-    # allower = Allower.new
-    # allower.allow :foo
-    # allower.allow :foo, :bar
-    # allower.allow :foo, :bar, :test
+    # rule = Rule.new
+    # rule.allow :foo
+    # rule.allow :foo, :bar
+    # rule.allow :foo, :bar, :test
     #
     def allow(*method_names)
       method_names.each do |mn|
-        @allower << mn
+        @rule << mn
       end
       tick
       @privileges
@@ -72,14 +72,14 @@ module Shikashi
     # Specifies that a method or list of methods are disallowed
     # Example
     #
-    # allower = Allower.new
-    # allower.disallow :foo
-    # allower.disallow :foo, :bar
-    # allower.disallow :foo, :bar, :test
+    # rule = Rule.new
+    # rule.disallow :foo
+    # rule.disallow :foo, :bar
+    # rule.disallow :foo, :bar, :test
     #
     def disallow(*method_names)
       method_names.each do |mn|
-        @disallower << mn
+        @disrule << mn
       end
       tick
       @privileges
