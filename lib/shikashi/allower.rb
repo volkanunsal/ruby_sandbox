@@ -5,10 +5,13 @@ module Shikashi
       @privileges = privileges
       @allower = []
       @disallower = []
+      @num_rules = 0
       @all = false
       @none = false
     end
 
+    # --------------- PREDICATES ----------------------
+    #
     # return true if the method named method_name is allowed
     # Example
     #
@@ -23,29 +26,6 @@ module Shikashi
     # instance of Allower
     def allowed?(method_name)
       @all || @allower.include?(method_name)
-    end
-
-    # Specifies that a method or list of methods are allowed
-    # Example
-    #
-    # allower = Allower.new
-    # allower.allow :foo
-    # allower.allow :foo, :bar
-    # allower.allow :foo, :bar, :test
-    #
-    def allow(*method_names)
-      method_names.each do |mn|
-        @allower << mn
-      end
-
-      @privileges
-    end
-
-    # Specifies that any method is allowed
-    def allow_all
-      @all = true
-
-      @privileges
     end
 
     # return true if the method named method_name is disallowed
@@ -64,6 +44,32 @@ module Shikashi
       @none || @disallower.include?(method_name)
     end
 
+
+    # --------------- ACTIONS ----------------------
+
+    # Specifies that a method or list of methods are allowed
+    # Example
+    #
+    # allower = Allower.new
+    # allower.allow :foo
+    # allower.allow :foo, :bar
+    # allower.allow :foo, :bar, :test
+    #
+    def allow(*method_names)
+      method_names.each do |mn|
+        @allower << mn
+      end
+      tick
+      @privileges
+    end
+
+    # Specifies that any method is allowed
+    def allow_all
+      @all = true
+      tick
+      @privileges
+    end
+
     # Specifies that a method or list of methods are disallowed
     # Example
     #
@@ -76,15 +82,25 @@ module Shikashi
       method_names.each do |mn|
         @disallower << mn
       end
-
+      tick
       @privileges
     end
 
     # Specifies that all methods are disallowed
     def disallow_all
       @none = true
-
+      tick
       @privileges
+    end
+
+    def num_rules
+      @num_rules
+    end
+
+    private
+
+    def tick
+      @num_rules += 1
     end
   end
 end

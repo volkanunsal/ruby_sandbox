@@ -212,7 +212,44 @@ module Shikashi
       build_allower(@allowed_klass_methods, klass.object_id)
     end
 
+    # TODO: test
+    #
+    # Applies a rule to permissions.
+    #
+    # Example
+    #   priv = Shikashi.privileges
+    #   priv.rule { instances_of(Fixnum).allow_all }
+    #
+    def rule(&blk)
+      num_rules_start = num_rules
+      self.instance_eval(&blk)
+      num_rules_end = num_rules
+
+      msg = "No action specified on the subject in rule."
+      raise ArgumentError.new(msg) if num_rules_end == num_rules_start
+    end
+
     private
+
+    def num_rules
+      this = self
+
+      instance_variables.inject(0) do |s, v|
+        rs = this.instance_variable_get(v)
+        count = proc { |rule|
+          s = rule.num_rules + s
+        }
+
+        case rs
+        when Hash
+          rs.each_value(&count)
+        when Array
+          rs.each(&count)
+        end
+
+        s
+      end
+    end
 
     def build_allower(hash, key)
       allower = hash[key]
