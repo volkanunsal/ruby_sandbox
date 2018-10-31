@@ -79,7 +79,7 @@ module Shikashi
     end
 
     def parse_klass(klass)
-      args.select { |x| x.kind_of?(klass) }
+      args.select { |x| x.is_a?(klass) }
     end
 
     def parse_hash_key(hash_key)

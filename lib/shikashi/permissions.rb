@@ -1,7 +1,10 @@
 require 'find'
 require 'shikashi/rule'
+require 'shikashi/rule_helpers'
 
+# rubocop:disable_line Style/Documentation
 module Shikashi
+  include RuleHelpers
   #
   # The Permissions class represent permissions about methods and objects
   #
@@ -232,35 +235,9 @@ module Shikashi
       raise ArgumentError, msg if num_rules_end == num_rules_start
     end
 
-    private
-
-    def num_rules
-      this = self
-
-      instance_variables.inject(0) do |s, v|
-        rs = this.instance_variable_get(v)
-        count = proc { |rule|
-          s = rule.num_rules + s
-        }
-
-        case rs
-        when Hash
-          rs.each_value(&count)
-        when Array
-          rs.each(&count)
-        end
-
-        s
-      end
-    end
-
-    def build_rule(hash, key)
-      rule = hash[key]
-      unless rule
-        rule = Rule.new(self)
-        hash[key] = rule
-      end
-      rule
+    def add_method(method_name)
+      @methods << method_name.to_sym
+      self
     end
   end
 end

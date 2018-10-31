@@ -1,10 +1,11 @@
 module Shikashi
   # Used in Whitelist to store information about specified method permissions
   class Rule
+    attr_reader :num_rules
+
     def initialize(privileges = nil)
       @privileges = privileges
       @rule = []
-      @disrule = []
       @num_rules = 0
       @all = false
       @none = false
@@ -41,10 +42,18 @@ module Shikashi
     # Whitelist#instance_of, Whitelist#methods_of and Whitelist#object returns the corresponding
     # instance of Rule
     def disallowed?(method_name)
-      @none || @disrule.include?(method_name)
+      @none || @rule.include?(method_name)
     end
 
     # --------------- ACTIONS ----------------------
+
+    def add_rule(*method_names)
+      method_names.each do |mn|
+        @rule << mn
+      end
+      tick
+      @privileges
+    end
 
     # Specifies that a method or list of methods are allowed
     # Example
@@ -54,13 +63,7 @@ module Shikashi
     # rule.allow :foo, :bar
     # rule.allow :foo, :bar, :test
     #
-    def allow(*method_names)
-      method_names.each do |mn|
-        @rule << mn
-      end
-      tick
-      @privileges
-    end
+    alias allow add_rule
 
     # Specifies that any method is allowed
     def allow_all
@@ -77,13 +80,7 @@ module Shikashi
     # rule.disallow :foo, :bar
     # rule.disallow :foo, :bar, :test
     #
-    def disallow(*method_names)
-      method_names.each do |mn|
-        @disrule << mn
-      end
-      tick
-      @privileges
-    end
+    alias disallow add_rule
 
     # Specifies that all methods are disallowed
     def disallow_all
@@ -91,8 +88,6 @@ module Shikashi
       tick
       @privileges
     end
-
-    attr_reader :num_rules
 
     private
 

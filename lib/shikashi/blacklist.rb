@@ -2,10 +2,6 @@ module Shikashi
   # Blacklist class provides methods to blacklist methods, classes
   # and class instances.
   class Blacklist < Permissions
-    def initialize
-      super
-    end
-
     def allow?(klass, recv, method_name)
       !blacklisted?(klass, recv, method_name)
     end
@@ -14,11 +10,18 @@ module Shikashi
       # TODO: add check for instance methods of
       # TODO: add check for klass of
       # TODO: add check for instance
-      disallows_method?(method_name)
+      rule_applies_to_method?(method_name)
     end
 
-    def disallows_method?(method_name)
-      @disallowed_methods.include?(method_name)
+    alias disallow_method add_method
+
+    def check_rule(rule, method_name)
+      rule && rule.disallowed?(method_name)
+    end
+
+    # TODO: test
+    def safe!
+      add_method :eval
     end
   end
 end
