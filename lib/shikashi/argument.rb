@@ -20,7 +20,7 @@ module Shikashi
   #
   #   args = [:foo, :bar]
   #   args = Argument.new(args)
-  #   value = args.pick(Binding, :binding) { Shikashi.global_binding }
+  #   value = args.pick(Binding, :binding) { RubySandbox.global_binding }
   #   # => binding
   #
   # Error cases
@@ -42,8 +42,10 @@ module Shikashi
     end
 
     def pick(*opts)
-      klass = Argument.new(opts).pick_by_class(Class)
-      hash_key = Argument.new(opts).pick_by_class(Symbol)
+      o = Argument.new(opts)
+
+      klass = o.pick_by_class(Class)
+      hash_key = o.pick_by_class(Symbol)
 
       ary = parse_args(hash_key, klass)
 
@@ -70,18 +72,18 @@ module Shikashi
 
     def parse_args(hash_key, klass)
       ary = []
-      ary = parse_klass(klass, ary) if klass
-      ary = parse_hash_key(hash_key, ary) if hash_key
+      ary += parse_klass(klass) if klass
+      ary += parse_hash_key(hash_key) if hash_key
       raise_ambiguous_error(klass, hash_key) if ary.size > 1
       ary
     end
 
-    def parse_klass(klass, ary)
-      ary += args.select { |x| x.instance_of?(klass) }
-      ary
+    def parse_klass(klass)
+      args.select { |x| x.instance_of?(klass) }
     end
 
-    def parse_hash_key(hash_key, ary)
+    def parse_hash_key(hash_key)
+      ary = []
       args.each do |x|
         next unless x.instance_of?(Hash)
 

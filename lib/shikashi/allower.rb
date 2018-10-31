@@ -44,7 +44,6 @@ module Shikashi
       @none || @disallower.include?(method_name)
     end
 
-
     # --------------- ACTIONS ----------------------
 
     # Specifies that a method or list of methods are allowed
@@ -93,9 +92,7 @@ module Shikashi
       @privileges
     end
 
-    def num_rules
-      @num_rules
-    end
+    attr_reader :num_rules
 
     private
 

@@ -3,6 +3,7 @@ require 'shikashi/permissions'
 require 'shikashi/version'
 require 'shikashi/sandbox'
 
+# Shikashi is a wrapper for Sandbox.
 module Shikashi
   # Backward compatibility
   Privileges = Whitelist

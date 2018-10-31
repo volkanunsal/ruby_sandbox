@@ -222,11 +222,11 @@ module Shikashi
     #
     def rule(&blk)
       num_rules_start = num_rules
-      self.instance_eval(&blk)
+      instance_eval(&blk)
       num_rules_end = num_rules
 
-      msg = "No action specified on the subject in rule."
-      raise ArgumentError.new(msg) if num_rules_end == num_rules_start
+      msg = 'No action specified on the subject in rule.'
+      raise ArgumentError, msg if num_rules_end == num_rules_start
     end
 
     private

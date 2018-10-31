@@ -46,11 +46,6 @@ module Shikashi
 
     attr_reader :hook_handler
 
-    # Same as Sandbox.new.run
-    def self.run(*args)
-      Sandbox.new.run(Shikashi.global_binding, *args)
-    end
-
     # Run the code in sandbox with the given privileges
     #
     #   (see examples)
