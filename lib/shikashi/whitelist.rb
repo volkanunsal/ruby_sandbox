@@ -4,11 +4,6 @@ module Shikashi
   class Whitelist < Permissions
     def initialize
       super
-      @allowed_objects = {}
-      @allowed_classes = {}
-      @allowed_instances = {}
-      @allowed_methods = []
-      @allowed_klass_methods = {}
     end
 
     def allow?(klass, recv, method_name)
@@ -29,7 +24,7 @@ module Shikashi
     #   privileges.allow_method(:foo)
     #
     def allow_method(method_name)
-      @allowed_methods << method_name.to_sym
+      @methods << method_name.to_sym
       self
     end
 
@@ -62,12 +57,12 @@ module Shikashi
     end
 
     def allows_method?(method_name)
-      @allowed_methods.include?(method_name)
+      @methods.include?(method_name)
     end
 
     def allows_method_on_obj?(recv, method_name)
       id = recv.object_id
-      rule = @allowed_objects[id]
+      rule = @objects[id]
       check_rule(rule, method_name)
     end
 
@@ -79,7 +74,7 @@ module Shikashi
 
       # Check if method's owner, i.e. class, is in allowed
       # klass methods
-      rule = @allowed_klass_methods[method.owner.object_id]
+      rule = @klass_methods[method.owner.object_id]
       check_rule(rule, method_name)
     end
 
@@ -99,12 +94,12 @@ module Shikashi
     end
 
     def allows_klass_of?(klass, method_name)
-      rule = @allowed_classes[klass.object_id]
+      rule = @classes[klass.object_id]
       check_rule(rule, method_name)
     end
 
     def allows_instance_of?(recv, method_name)
-      rule = @allowed_instances[recv.class.object_id]
+      rule = @instances[recv.class.object_id]
       check_rule(rule, method_name)
     end
 

@@ -7,10 +7,15 @@ module Shikashi
   #
   class Permissions
     def initialize
-      @allowed_read_globals = []
-      @allowed_read_consts = []
-      @allowed_write_globals = []
-      @allowed_write_consts = []
+      @readable_globals = []
+      @readable_consts = []
+      @writable_globals = []
+      @writable_consts = []
+      @objects = {}
+      @classes = {}
+      @methods = []
+      @instances = {}
+      @klass_methods = {}
     end
 
     def allow?(*)
@@ -22,19 +27,19 @@ module Shikashi
     end
 
     def global_read_allowed?(varname)
-      @allowed_read_globals.include? varname
+      @readable_globals.include? varname
     end
 
     def global_write_allowed?(varname)
-      @allowed_write_globals.include? varname
+      @writable_globals.include? varname
     end
 
     def const_read_allowed?(varname)
-      @allowed_read_consts.include? varname
+      @readable_consts.include? varname
     end
 
     def const_write_allowed?(varname)
-      @allowed_write_consts.include? varname
+      @writable_consts.include? varname
     end
 
     # Enables the permissions needed to execute system calls from the script
@@ -86,7 +91,7 @@ module Shikashi
     #
     def allow_global_read(*varnames)
       varnames.each do |varname|
-        @allowed_read_globals << varname.to_sym
+        @readable_globals << varname.to_sym
       end
 
       self
@@ -111,7 +116,7 @@ module Shikashi
     #
     def allow_global_write(*varnames)
       varnames.each do |varname|
-        @allowed_write_globals << varname.to_sym
+        @writable_globals << varname.to_sym
       end
 
       self
@@ -134,7 +139,7 @@ module Shikashi
     #   p A
     def allow_const_write(*varnames)
       varnames.each do |varname|
-        @allowed_write_consts << varname.to_s
+        @writable_consts << varname.to_s
       end
       self
     end
@@ -155,7 +160,7 @@ module Shikashi
     #
     def allow_const_read(*varnames)
       varnames.each do |varname|
-        @allowed_read_consts << varname.to_s
+        @readable_consts << varname.to_s
       end
 
       self
@@ -167,7 +172,7 @@ module Shikashi
     #   privileges.object(Hash).allow :new
     #
     def object(obj)
-      build_rule(@allowed_objects, obj.object_id)
+      build_rule(@objects, obj.object_id)
     end
 
     #
@@ -184,7 +189,7 @@ module Shikashi
     #   privileges.instances_of(Hash).allow_all
     #
     def instances_of(klass)
-      build_rule(@allowed_instances, klass.object_id)
+      build_rule(@instances, klass.object_id)
     end
 
     #
@@ -209,7 +214,7 @@ module Shikashi
     # ...
     #
     def methods_of(klass)
-      build_rule(@allowed_klass_methods, klass.object_id)
+      build_rule(@klass_methods, klass.object_id)
     end
 
     # Applies a rule to permissions.

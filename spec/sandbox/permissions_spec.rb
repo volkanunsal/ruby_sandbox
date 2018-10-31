@@ -3,7 +3,7 @@ require 'spec_helper'
 describe 'Shikashi::Permissions' do
   describe '#rule' do
     let(:blk) { proc {} }
-    let(:priv) { Whitelist.new }
+    let(:priv) { Permissions.new }
     let(:apply_rule) { priv.rule(&blk) }
 
     describe 'when action is given' do

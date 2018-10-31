@@ -4,7 +4,6 @@ module Shikashi
   class Blacklist < Permissions
     def initialize
       super
-      @disallowed_methods = []
     end
 
     def allow?(klass, recv, method_name)
