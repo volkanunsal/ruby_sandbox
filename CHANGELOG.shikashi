@@ -1,0 +1,45 @@
+0.6.0 Added dispose methods to allow freeing resources used by evalhook code
+
+0.5.3 Allowing method_missing calls
+
+0.5.2	Fix release (get_source_encoding)
+
+0.5.1	Fixed read of encoding of source files (encoding optional parameter or encoding header)
+
+0.5.0	Refactored sandbox to keep base namespace on each run  (see base_namespace example on README)
+
+		Code packet feature (see documentation)
+
+		Fixed spec to make it compatible with Ruby 1.9
+
+0.4.0	Removed evalmimic dependency
+
+		Implemented sugar syntax for Sandbox and Privileges methods (see documentation)
+
+		Added control over READ access to constants
+
+		Added control over READ access to global variables
+
+0.3.1	Fixed package info
+
+0.3.0	Added enclosure by base_namespace parameter (see examples)
+
+		shikashi HookHandler opened to allow use it in nested hook handlers
+
+		Added restriction to avoid the system calls when using %x[] and ``
+
+0.2.0	shikashi HookHandler opened to allow use it in nested hook handlers
+
+0.2.0	Added control over the access to constants and global variables (See documentation)
+
+		Remove rallhook dependency, replaced by getsource
+
+		Portability and stability improved by using  evalhook to hook the method calls in the place of rallhook
+
+		Added timeout restriction to the scripts executed in the sandbox (default unlimited)
+
+0.1.2	Fixed compatibility issues with ruby1.9
+
+0.1.1	Fixed issue 2: example2 failed when run under ruby1.9 (http://github.com/tario/shikashi/issues#issue/2)
+
+0.1.0	First functional release
