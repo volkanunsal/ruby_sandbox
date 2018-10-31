@@ -7,21 +7,17 @@ require 'shikashi/sandbox'
 
 # Shikashi is a wrapper for Sandbox.
 module Shikashi
-  # Backward compatibility
-  Privileges = Whitelist
-
-  # TODO: test
   def self.new
     Sandbox.new
   end
 
-  # TODO: test
-  def self.privileges(strategy = :whitelist)
+  def self.build(strategy = :blacklist)
     case strategy
     when :whitelist
       Whitelist.new
-    when :blacklist
-      Blacklist.new
+    when :blacklist, nil
+      priv = Blacklist.new
+      priv.safe!
     end
   end
 end

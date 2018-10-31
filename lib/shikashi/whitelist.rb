@@ -16,6 +16,8 @@ module Shikashi
       false
     end
 
+    alias allowed? allow?
+
     # allow the execution of method named method_name wherever
     #
     # Example:

@@ -2,11 +2,13 @@ module Shikashi
   # Blacklist class provides methods to blacklist methods, classes
   # and class instances.
   class Blacklist < Permissions
-    def allow?(klass, recv, method_name)
-      blacklisted?(klass, recv, method_name) == false
+    def allow?(*args)
+      blacklisted?(*args) == false
     end
 
-    def blacklisted?(_klass, _recv, method_name)
+    def blacklisted?(*opts)
+      args = Argument.new(opts)
+      method_name = args.pick_by_class(Symbol)
       # TODO: add check for instance methods of
       # TODO: add check for klass of
       # TODO: add check for instance

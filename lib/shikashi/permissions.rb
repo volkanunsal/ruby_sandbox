@@ -234,10 +234,13 @@ module Shikashi
 
       msg = 'No action specified on the subject in rule.'
       raise ArgumentError, msg if num_rules_end == num_rules_start
+
+      self
     end
 
     def add_method(method_name)
       @methods << method_name.to_sym
+      @methods.uniq!
       self
     end
   end
