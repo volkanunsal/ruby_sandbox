@@ -2,7 +2,6 @@ require 'evalhook'
 require 'getsource'
 require 'timeout'
 require 'shikashi/privileges'
-require 'shikashi/pick_argument'
 require 'shikashi/eval_hook_handler'
 require 'shikashi/sandbox/packet'
 
@@ -129,7 +128,8 @@ module Shikashi
     #   end', :privileges => privileges)
     #
     def run(*args)
-      t = args.pick(:timeout) { nil }
+      opts = Argument.new(args)
+      t = opts.pick(:timeout) { nil }
       raise Shikashi::Timeout::Error if t == 0
 
       t ||= 0
@@ -144,7 +144,8 @@ module Shikashi
     end
 
     def run_i(*args)
-      binding_ = args.pick(Binding, :binding) { Shikashi.global_binding }
+      opts = Argument.new(args)
+      binding_ = opts.pick(Binding, :binding) { Shikashi.global_binding }
       code, hook_handler, source = prepare_code(*args)
       hook_handler.evalhook(code, binding_, source)
     end
@@ -217,12 +218,13 @@ module Shikashi
 
     # rubocop:disable Metrics/AbcSize
     def prepare_code(*args)
-      privileges_ = args.pick(Privileges, :privileges) { Privileges.new }
-      code = args.pick(String, :code)
-      base_namespace = args.pick(:base_namespace) { nil }
-      no_base_namespace = args.pick(:no_base_namespace) { @no_base_namespace }
-      encoding = get_source_encoding(code) || args.pick(:encoding) { nil }
-      source = args.pick(:source) { generate_id }
+      opts = Argument.new(args)
+      privileges_ = opts.pick(Privileges, :privileges) { Privileges.new }
+      code = opts.pick(String, :code)
+      base_namespace = opts.pick(:base_namespace) { nil }
+      no_base_namespace = opts.pick(:no_base_namespace) { @no_base_namespace }
+      encoding = get_source_encoding(code) || opts.pick(:encoding) { nil }
+      source = opts.pick(:source) { generate_id }
 
       hook_handler = @hook_handler
       hook_handler = inst_hook_handler(base_namespace) if base_namespace
@@ -268,6 +270,8 @@ module Shikashi
     attr_reader :base_namespace
 
     def create_hook_handler(*args)
+      args = Argument.new(args)
+
       hook_handler = instantiate_evalhook_handler
       hook_handler.sandbox = self
       @base_namespace = args.pick(:base_namespace) { create_adhoc_base_namespace }

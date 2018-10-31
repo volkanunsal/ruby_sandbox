@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    shikashi (0.6.0)
+    shikashi (0.6.1)
       evalhook (>= 0.6.0)
       getsource (>= 0.1.0)
 

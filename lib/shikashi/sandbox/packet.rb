@@ -23,6 +23,7 @@ module Shikashi
       #             script to a given value in seconds.
       #
       def run(*args)
+        args = Argument.new(args)
         t = args.pick(:timeout) { nil }
         binding_ = args.pick(Binding, :binding) do
           nil
