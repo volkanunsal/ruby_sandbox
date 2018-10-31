@@ -3,157 +3,101 @@ require 'spec_helper'
 include Shikashi
 
 describe 'Whitelist' do
-  # method chaining
-  it 'allow_method should return object of Whitelist class' do
-    expect(Whitelist.allow_method(:foo)).to be_kind_of(Whitelist)
+  describe 'return values' do
+    [
+      Whitelist.allow_method(:foo),
+      Whitelist.allow_global_read(:$a),
+      Whitelist.allow_global_write(:$a),
+      Whitelist.allow_const_read(:$a),
+      Whitelist.allow_const_write(:$a),
+      Whitelist.allow_xstr,
+      Whitelist.instances_of(Fixnum).allow('foo'),
+      Whitelist.object(Fixnum).allow('foo'),
+      Whitelist.methods_of(Fixnum).allow('foo'),
+      Whitelist.instances_of(Fixnum).allow_all,
+      Whitelist.object(Fixnum).allow_all,
+      Whitelist.methods_of(Fixnum).allow_all,
+    ].each do |rule|
+      describe do
+        subject { rule }
+        it { is_expected.to be_kind_of(Whitelist) }
+      end
+    end
   end
 
-  it 'allow_global_read should return object of Whitelist class' do
-    expect(Whitelist.allow_global_read(:$a)).to be_kind_of(Whitelist)
+  describe '#rule' do
+    let(:blk) { proc {} }
+    let(:priv) { Whitelist.new }
+    let(:apply_rule) { priv.rule(&blk) }
+
+    describe 'when action is given' do
+      subject { apply_rule }
+      let(:blk) { proc { object(Fixnum).allow_all } }
+      it { is_expected.to be_nil }
+    end
+
+    describe 'when action is NOT given' do
+      subject { -> { apply_rule } }
+      let(:blk) { proc { object(Fixnum) } }
+      it {
+        msg = 'No action specified on the subject in rule.'
+        is_expected.to raise_error(ArgumentError, msg)
+      }
+    end
   end
 
-  it 'allow_global_write should return object of Whitelist class' do
-    expect(Whitelist.allow_global_write(:$a)).to be_kind_of(Whitelist)
+  describe '#allow_method' do
+    let(:method_name) { :to_s }
+    subject { Whitelist.allow_method(method_name) }
+    it { is_expected.to be_allow(Fixnum, 4, method_name) }
+
+    describe 'when method is a string' do
+      let(:method_name) { '+' }
+      it { is_expected.to be_allow(Fixnum, 4, method_name.to_sym) }
+    end
   end
 
-  it 'allow_const_read should return object of Whitelist class' do
-    expect(Whitelist.allow_const_read(:$a)).to be_kind_of(Whitelist)
+  describe '#global_read_allowed' do
+    let(:priv) { Whitelist.new }
+
+    describe 'single var name' do
+      let(:var_name) { :$a }
+      subject { priv.allow_global_read(var_name) }
+      it { is_expected.to be_global_read_allowed(var_name) }
+      describe 'when var_name is a string' do
+        let(:var_name) { '$a' }
+        it { is_expected.to be_global_read_allowed(var_name.to_sym) }
+      end
+    end
+
+    describe 'when multiple var names given' do
+      var_names = [:$a, :$b]
+      subject { priv.allow_global_read(*var_names) }
+      var_names.each do |name|
+        it { is_expected.to be_global_read_allowed(name) }
+      end
+    end
   end
 
-  it 'allow_const_write should return object of Whitelist class' do
-    expect(Whitelist.allow_const_write(:$a)).to be_kind_of(Whitelist)
-  end
+  describe '#global_write_allowed' do
+    let(:priv) { Whitelist.new }
 
-  it 'allow_xstr should return object of Whitelist class' do
-    expect(Whitelist.allow_xstr).to be_kind_of(Whitelist)
-  end
+    describe 'single var name' do
+      let(:var_name) { :$a }
+      subject { priv.allow_global_write(var_name) }
+      it { is_expected.to be_global_write_allowed(var_name) }
+      describe 'when var_name is a string' do
+        let(:var_name) { '$a' }
+        it { is_expected.to be_global_write_allowed(var_name.to_sym) }
+      end
+    end
 
-  it 'instances_of(...).allow() should return object of Whitelist class' do
-    expect(Whitelist.instances_of(Fixnum).allow('foo')).to be_kind_of(Whitelist)
-  end
-
-  it 'object(...).allow() should return object of Whitelist class' do
-    expect(Whitelist.object(Fixnum).allow('foo')).to be_kind_of(Whitelist)
-  end
-
-  it 'methods_of(...).allow() should return object of Whitelist class' do
-    expect(Whitelist.methods_of(Fixnum).allow('foo')).to be_kind_of(Whitelist)
-  end
-
-  it 'instances_of(...).allow() should return object of Whitelist class' do
-    expect(Whitelist.instances_of(Fixnum).allow_all).to be_kind_of(Whitelist)
-  end
-
-  it 'object(...).allow() should return object of Whitelist class' do
-    expect(Whitelist.object(Fixnum).allow_all).to be_kind_of(Whitelist)
-  end
-
-  it 'methods_of(...).allow() should return object of Whitelist class' do
-    expect(Whitelist.methods_of(Fixnum).allow_all).to be_kind_of(Whitelist)
-  end
-
-  it 'chain one allow_method' do
-    priv = Whitelist.allow_method(:to_s)
-    expect(priv.allow?(Fixnum, 4, :to_s)).to be == true
-  end
-
-  it 'chain one allow_method and one allow_global' do
-    priv = Whitelist
-           .allow_method(:to_s)
-           .allow_global_read(:$a)
-
-    expect(priv.allow?(Fixnum, 4, :to_s)).to be == true
-    expect(priv.global_read_allowed?(:$a)).to be == true
-  end
-
-  # argument conversion
-  it 'allows + method (as string)' do
-    priv = Whitelist.new
-    priv.allow_method('+')
-    expect(priv.allow?(Fixnum, 4, :+)).to be == true
-  end
-
-  it 'allows + method (as symbol)' do
-    priv = Whitelist.new
-    priv.allow_method(:+)
-    expect(priv.allow?(Fixnum, 4, :+)).to be == true
-  end
-
-  it 'allows $a global read (as string)' do
-    priv = Whitelist.new
-    priv.allow_global_read('$a')
-    expect(priv.global_read_allowed?(:$a)).to be == true
-  end
-
-  it 'allows $a global read (as symbol)' do
-    priv = Whitelist.new
-    priv.allow_global_read(:$a)
-    expect(priv.global_read_allowed?(:$a)).to be == true
-  end
-
-  it 'allows multiple global read (as symbol) in only one allow_global_read call' do
-    priv = Whitelist.new
-    priv.allow_global_read(:$a, :$b)
-    expect(priv.global_read_allowed?(:$a)).to be == true
-    expect(priv.global_read_allowed?(:$b)).to be == true
-  end
-
-  it 'allows $a global write (as string)' do
-    priv = Whitelist.new
-    priv.allow_global_write('$a')
-    expect(priv.global_write_allowed?(:$a)).to be == true
-  end
-
-  it 'allows $a global write (as symbol)' do
-    priv = Whitelist.new
-    priv.allow_global_write(:$a)
-    expect(priv.global_write_allowed?(:$a)).to be == true
-  end
-
-  it 'allows multiple global write (as symbol) in only one allow_global_write call' do
-    priv = Whitelist.new
-    priv.allow_global_write(:$a, :$b)
-    expect(priv.global_write_allowed?(:$a)).to be == true
-    expect(priv.global_write_allowed?(:$b)).to be == true
-  end
-
-  # constants
-
-  it 'allows constant read (as string)' do
-    priv = Whitelist.new
-    priv.allow_const_read('TESTCONSTANT')
-    expect(priv.const_read_allowed?('TESTCONSTANT')).to be == true
-  end
-
-  it 'allows constant read (as symbol)' do
-    priv = Whitelist.new
-    priv.allow_const_read(:TESTCONSTANT)
-    expect(priv.const_read_allowed?('TESTCONSTANT')).to be == true
-  end
-
-  it 'allows multiple constant read (as string) in only one allow_const_read call' do
-    priv = Whitelist.new
-    priv.allow_const_read('TESTCONSTANT1', 'TESTCONSTANT2')
-    expect(priv.const_read_allowed?('TESTCONSTANT1')).to be == true
-    expect(priv.const_read_allowed?('TESTCONSTANT2')).to be == true
-  end
-
-  it 'allows constant write (as string)' do
-    priv = Whitelist.new
-    priv.allow_const_write('TESTCONSTANT')
-    expect(priv.const_write_allowed?('TESTCONSTANT')).to be == true
-  end
-
-  it 'allows constant write (as symbol)' do
-    priv = Whitelist.new
-    priv.allow_const_write(:TESTCONSTANT)
-    expect(priv.const_write_allowed?('TESTCONSTANT')).to be == true
-  end
-
-  it 'allows multiple constant write (as symbol) in only one allow_const_write call' do
-    priv = Whitelist.new
-    priv.allow_const_write('TESTCONSTANT1', 'TESTCONSTANT2')
-    expect(priv.const_write_allowed?('TESTCONSTANT1')).to be == true
-    expect(priv.const_write_allowed?('TESTCONSTANT2')).to be == true
+    describe 'when multiple var names given' do
+      var_names = [:$a, :$b]
+      subject { priv.allow_global_write(*var_names) }
+      var_names.each do |name|
+        it { is_expected.to be_global_write_allowed(name) }
+      end
+    end
   end
 end

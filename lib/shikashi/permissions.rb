@@ -212,8 +212,6 @@ module Shikashi
       build_allower(@allowed_klass_methods, klass.object_id)
     end
 
-    # TODO: test
-    #
     # Applies a rule to permissions.
     #
     # Example
