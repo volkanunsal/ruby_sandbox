@@ -16,6 +16,7 @@ module RubySandbox
     end
 
     alias disallow_method add_method
+    alias deny_method add_method
 
     def check_rule(rule, method_name)
       rule && rule.disallowed?(method_name)

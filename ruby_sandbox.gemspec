@@ -5,10 +5,9 @@ require 'ruby_sandbox/version'
 Gem::Specification.new do |spec|
   spec.name          = 'ruby_sandbox'
   spec.version       = RubySandbox::VERSION
-  spec.authors       = ['Dario Seminara', 'Volkan Unsal']
-  spec.email         = ['robertodarioseminara@gmail.com', 'spocksplanet@gmail.com']
-
-  spec.summary       = 'ruby_sandbox is a ruby sandbox that permits the execution of "unprivileged" scripts by defining the permitted methods and constants the scripts can invoke with a white list logic'
+  spec.authors       = ['Volkan Unsal', 'Dario Seminara']
+  spec.email         = ['spocksplanet@gmail.com', 'robertodarioseminara@gmail.com']
+  spec.summary       = 'ruby_sandbox is a code sandbox that permits safe execution of "unprivileged" scripts.'
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
   # to allow pushing to a single host or delete this section to allow pushing to any host.

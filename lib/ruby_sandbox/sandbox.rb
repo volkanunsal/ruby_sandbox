@@ -23,8 +23,6 @@ module RubySandbox
   #
   #= Example
   #
-  # include RubySandbox
-  #
   # s = Sandbox.new
   # priv = Whitelist.new
   # priv.allow_method :print
@@ -93,16 +91,12 @@ module RubySandbox
     #
     # Example:
     #
-    # include RubySandbox
-    #
     # sandbox = Sandbox.new
     # privileges = Whitelist.new
     # privileges.allow_method :print
     # sandbox.run('print "hello world\n"', :privileges => privileges)
     #
     # Example 2:
-    # include RubySandbox
-    #
     # sandbox = Sandbox.new
     # privileges = Whitelist.new
     # privileges.allow_method :print
@@ -182,8 +176,6 @@ module RubySandbox
     # and binding which can be used when calling RubySandbox::Sandbox::Packet#run.
     #
     # Example:
-    #
-    # include RubySandbox
     #
     # sandbox = Sandbox.new
     #

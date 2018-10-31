@@ -1,17 +1,25 @@
-# call method defined in sandbox from outside
-
+#
+#
+#
+# Call method defined in sandbox from outside
+#
+#
+#
 require 'ruby_sandbox'
 
-s = RubySandbox::Sandbox.new
-priv = RubySandbox::Whitelist.new
+s = RubySandbox.new
+priv = RubySandbox.build(:whitelist)
 
-# allow execution of foo in this object
-priv.object(self).allow :foo
+obj = self
 
-# allow execution of puts in this object
-priv.object(self).allow :puts
+# Allow execution of :foo and :puts in this object
+priv.rule do
+  object(obj)
+    .allow(:foo)
+    .allow(:puts)
+end
 
-# inside the sandbox, only can use method foo on main and method times on instances of Fixnum
+# Inside the sandbox, only can use method foo on main and method times on instances of Fixnum
 code = "
 def inside_foo(a)
 	puts 'inside_foo'
@@ -24,4 +32,4 @@ end
 s.run(code, priv, no_base_namespace: true)
 
 inside_foo(false)
-inside_foo(true) # SecurityError
+
