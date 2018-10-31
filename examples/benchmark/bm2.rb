@@ -16,6 +16,6 @@ Benchmark.bm(7) do |x|
 		}
 		"
 
-    s.run code, Shikashi::Privileges.allow_method(:times).allow_method(:foo)
+    s.run code, Shikashi::Whitelist.allow_method(:times).allow_method(:foo)
   end
 end

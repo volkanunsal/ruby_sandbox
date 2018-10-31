@@ -2,7 +2,7 @@ require 'rubygems'
 require 'shikashi'
 
 s = Shikashi::Sandbox.new
-perm = Shikashi::Privileges.new
+perm = Shikashi::Whitelist.new
 
 perm.allow_method :sleep
 

@@ -3,7 +3,7 @@ require 'rubygems'
 require 'shikashi'
 
 s = Shikashi::Sandbox.new
-priv = Shikashi::Privileges.new
+priv = Shikashi::Whitelist.new
 
 # allow execution of foo in this object
 priv.object(self).allow :foo

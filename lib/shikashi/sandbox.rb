@@ -1,8 +1,7 @@
 require 'evalhook'
 require 'getsource'
 require 'timeout'
-require 'shikashi/privileges_base'
-require 'shikashi/privileges'
+require 'shikashi/whitelist'
 require 'shikashi/eval_hook_handler'
 require 'shikashi/sandbox/packet'
 
@@ -30,7 +29,7 @@ module Shikashi
   # include Shikashi
   #
   # s = Sandbox.new
-  # priv = Privileges.new
+  # priv = Whitelist.new
   # priv.allow_method :print
   #
   # s.run(priv, 'print "hello world\n"')
@@ -61,10 +60,10 @@ module Shikashi
     # :code       Mandatory argument of class String with the code to execute
     #             restricted in the sandbox
     #
-    # :privileges Optional argument of class Shikashi::Sandbox::Privileges to
+    # :privileges Optional argument of class Shikashi::Sandbox::Whitelist to
     #             indicate the restrictions of the code executed in the sandbox.
-    #             The default is an empty Privileges (absolutly no permission.)
-    #             Must be of class Privileges or passed as hash_key
+    #             The default is an empty Whitelist (absolutly no permission.)
+    #             Must be of class Whitelist or passed as hash_key
     #             (:privileges => privileges)
     #
     # :binding   Optional argument with the binding object of the context where
@@ -108,7 +107,7 @@ module Shikashi
     # include Shikashi
     #
     # sandbox = Sandbox.new
-    # privileges = Privileges.new
+    # privileges = Whitelist.new
     # privileges.allow_method :print
     # sandbox.run('print "hello world\n"', :privileges => privileges)
     #
@@ -119,7 +118,7 @@ module Shikashi
     # include Shikashi
     #
     # sandbox = Sandbox.new
-    # privileges = Privileges.new
+    # privileges = Whitelist.new
     # privileges.allow_method :print
     # privileges.allow_method :singleton_method_added
     #
@@ -171,10 +170,10 @@ module Shikashi
     # :code             Mandatory argument of class String with the code to
     #                   execute restricted in the sandbox
     #
-    # :privileges       Optional argument of class Shikashi::Sandbox::Privileges
+    # :privileges       Optional argument of class Shikashi::Sandbox::Whitelist
     #                   to indicate the restrictions of the code executed in
-    #                   the sandbox. The default is an empty Privileges (absolutely
-    #                   no permission.) Must be of class Privileges or passed
+    #                   the sandbox. The default is an empty Whitelist (absolutely
+    #                   no permission.) Must be of class Whitelist or passed
     #                   as hash_key (:privileges => privileges)
     #
     # :source           Optional argument to indicate the "source name",
@@ -205,7 +204,7 @@ module Shikashi
     #
     # sandbox = Sandbox.new
     #
-    # privileges = Privileges.allow_method(:print)
+    # privileges = Whitelist.allow_method(:print)
     #
     # # this is equivallent to sandbox.run('print "hello world\n"')
     # packet = sandbox.packet('print "hello world\n"', privileges)
@@ -220,7 +219,7 @@ module Shikashi
     # rubocop:disable Metrics/AbcSize
     def prepare_code(*args)
       opts = Argument.new(args)
-      privileges_ = opts.pick(Privileges, :privileges) { Privileges.new }
+      privileges_ = opts.pick(Whitelist, :privileges) { Whitelist.new }
       code = opts.pick(String, :code)
       base_namespace = opts.pick(:base_namespace) { nil }
       no_base_namespace = opts.pick(:no_base_namespace) { @no_base_namespace }
@@ -279,7 +278,7 @@ module Shikashi
       hook_handler.base_namespace = @base_namespace
 
       source = args.pick(:source) { generate_id }
-      privileges_ = args.pick(Privileges, :privileges) { Privileges.new }
+      privileges_ = args.pick(Whitelist, :privileges) { Whitelist.new }
 
       privileges[source] = privileges_
 

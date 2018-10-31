@@ -1,7 +1,7 @@
 module Shikashi
-  # Privileges class provides methods to whitelist methods, classes
+  # Blacklist class provides methods to blacklist methods, classes
   # and class instances.
-  class Blacklist < PrivilegesBase
+  class Blacklist < Permissions
     def initialize
       super
       @disallowed_methods = []

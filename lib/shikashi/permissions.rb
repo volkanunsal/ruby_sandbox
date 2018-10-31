@@ -3,9 +3,9 @@ require 'shikashi/allower'
 
 module Shikashi
   #
-  # The PrivilegesBase class represent permissions about methods and objects
+  # The Permissions class represent permissions about methods and objects
   #
-  class PrivilegesBase
+  class Permissions
     def initialize
       @allowed_read_globals = []
       @allowed_read_consts = []
@@ -42,7 +42,7 @@ module Shikashi
     # Example:
     #
     #   s = Sandbox.new
-    #   priv = Privileges.new
+    #   priv = Whitelist.new
     #
     #   priv.allow_xstr
     #
@@ -53,7 +53,7 @@ module Shikashi
     #
     # Example 2:
     #
-    #   Sandbox.run('%x[ls -l]', Privileges.allow_xstr)
+    #   Sandbox.run('%x[ls -l]', Whitelist.allow_xstr)
     #
     def allow_xstr
       @xstr_allowed = true
@@ -66,7 +66,7 @@ module Shikashi
     # Example:
     #
     #   s = Sandbox.new
-    #   priv = Privileges.new
+    #   priv = Whitelist.new
     #
     #   priv.allow_method :print
     #   priv.allow_global_read :$a
@@ -82,7 +82,7 @@ module Shikashi
     #   Sandbox.run('
     #   print "$a value:", $a, "s\n"
     #   print "$b value:", $b, "s\n"
-    #   ', Privileges.allow_global_read(:$a,:$b) )
+    #   ', Whitelist.allow_global_read(:$a,:$b) )
     #
     def allow_global_read(*varnames)
       varnames.each do |varname|
@@ -97,7 +97,7 @@ module Shikashi
     # Example:
     #
     #   s = Sandbox.new
-    #   priv = Privileges.new
+    #   priv = Whitelist.new
     #
     #   priv.allow_method :print
     #   priv.allow_global_write :$a
@@ -121,7 +121,7 @@ module Shikashi
     #
     # Example:
     #   s = Sandbox.new
-    #   priv = Privileges.new
+    #   priv = Whitelist.new
     #
     #   priv.allow_method :print
     #   priv.allow_const_write "Object::A"
@@ -143,7 +143,7 @@ module Shikashi
     #
     # Example:
     #   s = Sandbox.new
-    #   priv = Privileges.new
+    #   priv = Whitelist.new
     #
     #   priv.allow_method :print
     #   priv.allow_const_read "Object::A"

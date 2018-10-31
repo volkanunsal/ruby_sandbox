@@ -1,5 +1,5 @@
 module Shikashi
-  # Used in Privileges to store information about specified method permissions
+  # Used in Whitelist to store information about specified method permissions
   class Allower
     def initialize(privileges = nil)
       @privileges = privileges
@@ -19,7 +19,7 @@ module Shikashi
     # allower.allow_all
     # allower.allowed? :bar # => true
     #
-    # Privileges#instance_of, Privileges#methods_of and Privileges#object returns the corresponding
+    # Whitelist#instance_of, Whitelist#methods_of and Whitelist#object returns the corresponding
     # instance of Allower
     def allowed?(method_name)
       @all || @allower.include?(method_name)
@@ -58,7 +58,7 @@ module Shikashi
     # allower.disallow_all
     # allower.disallowed? :bar # => true
     #
-    # Privileges#instance_of, Privileges#methods_of and Privileges#object returns the corresponding
+    # Whitelist#instance_of, Whitelist#methods_of and Whitelist#object returns the corresponding
     # instance of Allower
     def disallowed?(method_name)
       @none || @disallower.include?(method_name)

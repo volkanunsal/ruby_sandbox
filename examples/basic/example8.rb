@@ -16,7 +16,7 @@ Shikashi::Sandbox.new.run("
   		print \"foo defined inside the sandbox\\n\"
   	end
   end
-  ", Shikashi::Privileges.allow_method(:print), base_namespace: SandboxModule)
+  ", Shikashi::Whitelist.allow_method(:print), base_namespace: SandboxModule)
 
 x = X.new # X class is not affected by the sandbox (The X Class defined in the sandbox is SandboxModule::X)
 x.foo

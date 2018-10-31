@@ -29,7 +29,7 @@ describe Sandbox, 'Shikashi sandbox hook handler' do
 
   it 'should not raise SecurityError with method privileges' do
     sandbox = Sandbox.new
-    priv = Privileges.new
+    priv = Whitelist.new
     priv.allow_method(:foo)
 
     hook_handler = sandbox.create_hook_handler(privileges: priv, source: 'test-source')
@@ -60,7 +60,7 @@ describe Sandbox, 'Shikashi sandbox hook handler' do
 
   it 'should not raise SecurityError with handle_gasgn with privileges' do
     sandbox = Sandbox.new
-    privileges = Privileges.new
+    privileges = Whitelist.new
 
     privileges.allow_global_write(:$a)
 
@@ -91,7 +91,7 @@ describe Sandbox, 'Shikashi sandbox hook handler' do
 
   it 'should not raise SecurityError with handle_cdecl with privileges' do
     sandbox = Sandbox.new
-    privileges = Privileges.new
+    privileges = Whitelist.new
 
     privileges.allow_const_write('Object::A')
 
@@ -122,7 +122,7 @@ describe Sandbox, 'Shikashi sandbox hook handler' do
 
   it 'should not raise SecurityError with handle_gasgn with privileges' do
     sandbox = Sandbox.new
-    privileges = Privileges.new
+    privileges = Whitelist.new
 
     privileges.allow_global_read(:$a)
 
@@ -153,7 +153,7 @@ describe Sandbox, 'Shikashi sandbox hook handler' do
 
   it 'should not raise SecurityError with handle_cdecl with privileges' do
     sandbox = Sandbox.new
-    privileges = Privileges.new
+    privileges = Whitelist.new
 
     ::A = nil
     privileges.allow_const_read('A')

@@ -4,7 +4,7 @@ require 'rubygems'
 require 'shikashi'
 
 s = Shikashi::Sandbox.new
-priv = Shikashi::Privileges.new
+priv = Shikashi::Whitelist.new
 
 # allow execution of print
 priv.allow_method :print

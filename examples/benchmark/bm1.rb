@@ -14,12 +14,12 @@ s = Shikashi::Sandbox.new
 Benchmark.bm(7) do |x|
   x.report('normal') do
     1000.times do
-      s.run(code, Shikashi::Privileges.allow_method(:new))
+      s.run(code, Shikashi::Whitelist.allow_method(:new))
     end
   end
 
   x.report('packet') do
-    packet = s.packet(code, Shikashi::Privileges.allow_method(:new))
+    packet = s.packet(code, Shikashi::Whitelist.allow_method(:new))
     1000.times do
       packet.run
     end

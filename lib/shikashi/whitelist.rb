@@ -1,7 +1,7 @@
 module Shikashi
-  # Privileges class provides methods to whitelist methods, classes
+  # Whitelist class provides methods to whitelist methods, classes
   # and class instances.
-  class Privileges < PrivilegesBase
+  class Whitelist < Permissions
     def initialize
       super
       @allowed_objects = {}
@@ -114,10 +114,10 @@ module Shikashi
 
     # Define singleton methods using instance methods of this class.
     class << self
-      im = (Shikashi::Privileges.instance_methods - Object.instance_methods)
+      im = (Shikashi::Whitelist.instance_methods - Object.instance_methods)
       im.each do |mname|
         define_method(mname) do |*args|
-          Shikashi::Privileges.new.send(mname, *args)
+          Shikashi::Whitelist.new.send(mname, *args)
         end
       end
     end

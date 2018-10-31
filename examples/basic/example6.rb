@@ -5,7 +5,7 @@ require 'shikashi'
 
 include Shikashi
 
-priv = Shikashi::Privileges.allow_method(:print).allow_global_write(:$a)
+priv = Shikashi::Whitelist.allow_method(:print).allow_global_write(:$a)
 Shikashi::Sandbox.run(priv,
                       '
                       $a = 9

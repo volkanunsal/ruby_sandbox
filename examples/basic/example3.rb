@@ -20,7 +20,7 @@ class ShikaX
   end
 end
 
-priv = Shikashi::Privileges
+priv = Shikashi::Whitelist
        .allow_method(:print) # allow execution of print
        .object(ShikaX).allow(:new) # allow method new of class ShikaX
        .instances_of(ShikaX).allow(:foo, :bar) # allow instance methods of ShikaX. Note that the method privileged_operations is not allowed

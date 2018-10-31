@@ -10,7 +10,7 @@ describe Sandbox, 'Shikashi sandbox' do
   end
 
   it 'should run empty code with privileges' do
-    Sandbox.new.run '', Privileges.new
+    Sandbox.new.run '', Whitelist.new
   end
 
   class X
@@ -26,7 +26,7 @@ describe Sandbox, 'Shikashi sandbox' do
 
   it 'should not raise anything when call method with privileges' do
     x = X.new
-    privileges = Privileges.new
+    privileges = Whitelist.new
     def privileges.allow?(*_args)
       true
     end
@@ -42,7 +42,7 @@ describe Sandbox, 'Shikashi sandbox' do
   end
 
   it 'should allow use a class declared inside' do
-    priv = Privileges.new
+    priv = Whitelist.new
     priv.allow_method :new
     Sandbox.new.run("
       class ::TestInsideClass
@@ -117,7 +117,7 @@ describe Sandbox, 'Shikashi sandbox' do
 
   it 'should not allow xstr when no authorized' do
     s = Sandbox.new
-    priv = Privileges.new
+    priv = Whitelist.new
 
     expect do
       s.run('%x[echo hello world]', priv)
@@ -126,7 +126,7 @@ describe Sandbox, 'Shikashi sandbox' do
 
   it 'should allow xstr when authorized' do
     s = Sandbox.new
-    priv = Privileges.new
+    priv = Whitelist.new
 
     priv.allow_xstr
 
@@ -137,7 +137,7 @@ describe Sandbox, 'Shikashi sandbox' do
 
   it 'should not allow global variable read' do
     s = Sandbox.new
-    priv = Privileges.new
+    priv = Whitelist.new
 
     expect do
       s.run('$a', priv)
@@ -146,7 +146,7 @@ describe Sandbox, 'Shikashi sandbox' do
 
   it 'should allow global variable read when authorized' do
     s = Sandbox.new
-    priv = Privileges.new
+    priv = Whitelist.new
 
     priv.allow_global_read(:$a)
 
@@ -157,7 +157,7 @@ describe Sandbox, 'Shikashi sandbox' do
 
   it 'should not allow constant variable read' do
     s = Sandbox.new
-    priv = Privileges.new
+    priv = Whitelist.new
 
     TESTCONSTANT9999 = 9999
     expect do
@@ -167,7 +167,7 @@ describe Sandbox, 'Shikashi sandbox' do
 
   it 'should allow constant read when authorized' do
     s = Sandbox.new
-    priv = Privileges.new
+    priv = Whitelist.new
 
     priv.allow_const_read('TESTCONSTANT9998')
     ::TESTCONSTANT9998 = 9998
@@ -179,7 +179,7 @@ describe Sandbox, 'Shikashi sandbox' do
 
   it 'should allow read constant nested on classes when authorized' do
     s = Sandbox.new
-    priv = Privileges.new
+    priv = Whitelist.new
 
     priv.allow_const_read('Fixnum')
     Fixnum::TESTCONSTANT9997 = 9997
@@ -191,7 +191,7 @@ describe Sandbox, 'Shikashi sandbox' do
 
   it 'should not allow global variable write' do
     s = Sandbox.new
-    priv = Privileges.new
+    priv = Whitelist.new
 
     expect do
       s.run('$a = 9', priv)
@@ -200,7 +200,7 @@ describe Sandbox, 'Shikashi sandbox' do
 
   it 'should allow global variable write when authorized' do
     s = Sandbox.new
-    priv = Privileges.new
+    priv = Whitelist.new
 
     priv.allow_global_write(:$a)
 
@@ -211,7 +211,7 @@ describe Sandbox, 'Shikashi sandbox' do
 
   it 'should not allow constant write' do
     s = Sandbox.new
-    priv = Privileges.new
+    priv = Whitelist.new
 
     expect do
       s.run('TESTCONSTANT9999 = 99991', priv)
@@ -220,7 +220,7 @@ describe Sandbox, 'Shikashi sandbox' do
 
   it 'should allow constant write when authorized' do
     s = Sandbox.new
-    priv = Privileges.new
+    priv = Whitelist.new
 
     priv.allow_const_write('TESTCONSTANT9998')
 
@@ -232,7 +232,7 @@ describe Sandbox, 'Shikashi sandbox' do
 
   it 'should allow write constant nested on classes when authorized' do
     s = Sandbox.new
-    priv = Privileges.new
+    priv = Whitelist.new
 
     priv.allow_const_read('Fixnum')
     priv.allow_const_write('Fixnum::TESTCONSTANT9997')
@@ -283,7 +283,7 @@ describe Sandbox, 'Shikashi sandbox' do
   end
 
   package_oracle ['1'], [binding: binding]
-  package_oracle ['1+1', { privileges: Privileges.allow_method(:+) }], [binding: binding]
+  package_oracle ['1+1', { privileges: Whitelist.allow_method(:+) }], [binding: binding]
 
   it 'should accept references to classes defined on previous run' do
     sandbox = Sandbox.new
@@ -303,7 +303,7 @@ describe Sandbox, 'Shikashi sandbox' do
 
   it 'should allow method_missing handling' do
     sandbox = Sandbox.new
-    privileges = Privileges.new
+    privileges = Whitelist.new
     privileges.allow_const_read('OutsideX44_ins')
     privileges.instances_of(OutsideX44).allow :method_missing
 

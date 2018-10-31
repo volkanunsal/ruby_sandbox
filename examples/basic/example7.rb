@@ -1,7 +1,7 @@
 require 'rubygems'
 require 'shikashi'
 
-priv = Shikashi::Privileges
+priv = Shikashi::Whitelist
        .allow_method(:print)
        .allow_const_write('Object::A')
 
