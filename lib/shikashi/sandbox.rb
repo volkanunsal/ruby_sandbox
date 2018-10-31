@@ -214,7 +214,7 @@ module Shikashi
     # rubocop:disable Metrics/AbcSize
     def prepare_code(*args)
       opts = Argument.new(args)
-      privileges_ = opts.pick(Whitelist, :privileges) { Whitelist.new }
+      privileges_ = opts.pick(Permissions, :privileges) { Whitelist.new }
       code = opts.pick(String, :code)
       base_namespace = opts.pick(:base_namespace) { nil }
       no_base_namespace = opts.pick(:no_base_namespace) { @no_base_namespace }
@@ -273,7 +273,7 @@ module Shikashi
       hook_handler.base_namespace = @base_namespace
 
       source = args.pick(:source) { generate_id }
-      privileges_ = args.pick(Whitelist, :privileges) { Whitelist.new }
+      privileges_ = args.pick(Permissions, :privileges) { Whitelist.new }
 
       privileges[source] = privileges_
 

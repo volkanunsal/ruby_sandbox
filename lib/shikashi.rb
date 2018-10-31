@@ -1,5 +1,7 @@
 require 'shikashi/argument'
 require 'shikashi/permissions'
+require 'shikashi/whitelist'
+require 'shikashi/blacklist'
 require 'shikashi/version'
 require 'shikashi/sandbox'
 
