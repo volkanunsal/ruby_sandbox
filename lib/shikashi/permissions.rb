@@ -244,7 +244,7 @@ module Shikashi
         when Array
           rs.each(&count)
         end
-        
+
         s
       end
     end
