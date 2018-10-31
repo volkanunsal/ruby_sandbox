@@ -5,33 +5,38 @@ include Shikashi
 $top_level_binding = binding
 
 describe 'Sandbox#run' do
-  it 'should run empty code without privileges' do
-    Sandbox.new.run ''
+  describe 'empty code (with and without privileges)' do
+    [nil, Whitelist.new].each do |v|
+      describe do
+        let(:priv) { v }
+        subject { -> { Sandbox.new.run '', priv } }
+        it { is_expected.to_not raise_error }
+      end
+    end
   end
 
-  it 'should run empty code with privileges' do
-    Sandbox.new.run '', Whitelist.new
-  end
+  describe 'non-empty code' do
+    class X
+      def foo; end
+    end
+    let(:code) { 'x.foo' }
+    let(:action) { Sandbox.new.run(code, binding, opts) }
+    let(:opts) { { privileges: priv, no_base_namespace: true } }
+    subject { -> { action }}
+    before  { x = X.new }
 
-  class X
-    def foo; end
-  end
-  it 'should raise SecurityError when call method without privileges' do
-    x = X.new
-
-    expect do
-      Sandbox.new.run 'x.foo', binding, no_base_namespace: true
-    end.to raise_error(SecurityError)
-  end
-
-  it 'should not raise anything when call method with privileges' do
-    x = X.new
-    privileges = Whitelist.new
-    def privileges.allow?(*_args)
-      true
+    describe 'without privileges' do
+      let(:priv) { nil }
+      it { is_expected.to raise_error(SecurityError) }
     end
 
-    Sandbox.new.run 'x.foo', binding, privileges: privileges, no_base_namespace: true
+    describe 'with privileges' do
+      let(:priv) { Whitelist.new }
+      before  do
+        allow(priv).to receive(:allow?).and_return(true)
+      end
+      it { is_expected.to_not raise_error(SecurityError) }
+    end
   end
 
   module ::A4
@@ -59,13 +64,11 @@ describe 'Sandbox#run' do
   end
 
   it 'should change base namespace when classes are declared (2 levels)' do
-    Sandbox.new.run("
-                class ::X4
-                   def foo
-                   end
-                end
-            ",
-                    base_namespace: A4)
+    code = "class ::X4
+               def foo
+               end
+            end"
+    Sandbox.new.run(code, base_namespace: A4)
 
     A4::X4
   end
@@ -76,14 +79,11 @@ describe 'Sandbox#run' do
   end
 
   it 'should change base namespace when classes are declared (3 levels)' do
-    Sandbox.new.run("
-                class ::X4
-                   def foo
-                   end
-                end
-            ",
-                    $top_level_binding, base_namespace: ::A4::B4)
-
+    code = "class ::X4
+               def foo
+               end
+            end"
+    Sandbox.new.run(code, $top_level_binding, base_namespace: ::A4::B4)
     A4::B4::X4
   end
 
