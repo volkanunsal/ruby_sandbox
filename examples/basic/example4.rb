@@ -1,6 +1,6 @@
 # call method defined in sandbox from outside
 
-require 'rubygems'
+
 require 'shikashi'
 
 s = Shikashi::Sandbox.new

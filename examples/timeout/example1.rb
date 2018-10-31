@@ -1,4 +1,4 @@
-require 'rubygems'
+  
 require 'shikashi'
 
 s = Shikashi::Sandbox.new

@@ -1,6 +1,6 @@
 # call external method from inside the sandbox
 
-require 'rubygems'
+
 require 'shikashi'
 
 def foo

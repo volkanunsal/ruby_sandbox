@@ -1,6 +1,6 @@
 # define a class from inside the sandbox and use it from outside
 
-require 'rubygems'
+
 require 'shikashi'
 
 s = Shikashi::Sandbox.new
