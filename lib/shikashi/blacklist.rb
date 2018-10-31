@@ -3,7 +3,7 @@ module Shikashi
   # and class instances.
   class Blacklist < Permissions
     def allow?(klass, recv, method_name)
-      !blacklisted?(klass, recv, method_name)
+      blacklisted?(klass, recv, method_name) == false
     end
 
     def blacklisted?(_klass, _recv, method_name)
@@ -19,9 +19,8 @@ module Shikashi
       rule && rule.disallowed?(method_name)
     end
 
-    # TODO: test
     def safe!
-      add_method :eval
+      disallow_method :eval
     end
   end
 end

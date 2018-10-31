@@ -4,11 +4,12 @@ require 'shikashi/rule_helpers'
 
 # rubocop:disable_line Style/Documentation
 module Shikashi
-  include RuleHelpers
   #
   # The Permissions class represent permissions about methods and objects
   #
   class Permissions
+    include RuleHelpers
+
     def initialize
       @readable_globals = []
       @readable_consts = []
