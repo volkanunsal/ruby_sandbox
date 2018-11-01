@@ -5,7 +5,7 @@ RubySandbox is a configurable sandbox that ensures safe execution of untrusted R
 ## Installation
 
 ```
-sudo gem install ruby_sandbox
+gem 'ruby_sandbox', github: 'volkanunsal/ruby_sandbox'
 ```
 
 ## Usage
