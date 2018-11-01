@@ -4,10 +4,11 @@ RubySandbox is a configurable sandbox that ensures safe execution of untrusted R
 
 ## Installation
 
-```
+```ruby
 # In your Gemfile
 gem 'ruby_sandbox', github: 'volkanunsal/ruby_sandbox'
-
+```
+```
 $ bundle install
 ```
 
