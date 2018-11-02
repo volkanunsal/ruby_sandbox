@@ -4,7 +4,7 @@ module RubySandbox
   # and class instances.
   #
   class Whitelist < Permissions
-    def allow?(klass, recv, method_name)
+    def allowed?(klass, recv, method_name)
       rule_applies_to_method?(method_name) ||
         rule_applies_to_method_on_obj?(recv, method_name) ||
         rule_applies_to_instance_methods_of?(klass, method_name) ||
@@ -15,8 +15,6 @@ module RubySandbox
       print e.backtrace.join("\n")
       false
     end
-
-    alias allowed? allow?
 
     # allow the execution of method named method_name wherever
     #
@@ -41,10 +39,6 @@ module RubySandbox
     def allow_class_definitions
       instances_of(Class).allow nil, :inherited, :method_added
       allow_method 'core#define_method'.to_sym
-    end
-
-    def check_rule(rule, method_name)
-      rule && rule.allowed?(method_name)
     end
 
     # Define singleton methods using instance methods of this class.

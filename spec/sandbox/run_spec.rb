@@ -33,7 +33,7 @@ describe 'Sandbox#run' do
     describe 'with privileges' do
       let(:priv) { Whitelist.new }
       before  do
-        allow(priv).to receive(:allow?).and_return(true)
+        allow(priv).to receive(:allowed?).and_return(true)
       end
       it { is_expected.to_not raise_error(SecurityError) }
     end

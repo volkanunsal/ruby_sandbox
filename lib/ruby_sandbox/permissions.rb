@@ -22,7 +22,7 @@ module RubySandbox
       @klass_methods = {}
     end
 
-    def allow?(*)
+    def allowed?(*)
       true
     end
 
@@ -242,6 +242,11 @@ module RubySandbox
       @methods << method_name.to_sym
       @methods.uniq!
       self
+    end
+
+    # TODO: test
+    def check_rule(rule, method_name)
+      rule && (rule.disallowed?(method_name) || !rule.allowed?(method_name))
     end
   end
 end

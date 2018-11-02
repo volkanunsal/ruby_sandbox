@@ -28,11 +28,11 @@ describe 'Whitelist' do
   describe '#allow_method' do
     let(:method_name) { :to_s }
     subject { Whitelist.allow_method(method_name) }
-    it { is_expected.to be_allow(Fixnum, 4, method_name) }
+    it { is_expected.to be_allowed(Fixnum, 4, method_name) }
 
     describe 'when method is a string' do
       let(:method_name) { '+' }
-      it { is_expected.to be_allow(Fixnum, 4, method_name.to_sym) }
+      it { is_expected.to be_allowed(Fixnum, 4, method_name.to_sym) }
     end
   end
 end

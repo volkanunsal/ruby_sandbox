@@ -2,7 +2,7 @@ module RubySandbox
   # Blacklist class provides methods to blacklist methods, classes
   # and class instances.
   class Blacklist < Permissions
-    def allow?(*args)
+    def allowed?(*args)
       blacklisted?(*args) == false
     end
 
@@ -16,10 +16,6 @@ module RubySandbox
     end
 
     alias deny_method add_method
-
-    def check_rule(rule, method_name)
-      rule && rule.disallowed?(method_name)
-    end
 
     def safe!
       deny_method :eval
