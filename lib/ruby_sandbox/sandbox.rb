@@ -1,6 +1,6 @@
 require 'evalhook'
-require 'getsource'
 require 'timeout'
+require 'ruby_sandbox/getsource'
 require 'ruby_sandbox/whitelist'
 require 'ruby_sandbox/eval_hook_handler'
 require 'ruby_sandbox/sandbox/packet'
