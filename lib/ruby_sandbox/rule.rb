@@ -29,19 +29,19 @@ module RubySandbox
       @all || @rule.include?(method_name)
     end
 
-    # return true if the method named method_name is disallowed
+    # return true if the method named method_name is denied
     # Example
     #
     # rule = Rule.new
-    # rule.disallowed? :foo # => false
-    # rule.disallow :foo
-    # rule.disallowed? :foo # => true
-    # rule.disallow_all
-    # rule.disallowed? :bar # => true
+    # rule.denied? :foo # => false
+    # rule.deny :foo
+    # rule.denied? :foo # => true
+    # rule.deny_all
+    # rule.denied? :bar # => true
     #
     # Whitelist#instance_of, Whitelist#methods_of and Whitelist#object returns the corresponding
     # instance of Rule
-    def disallowed?(method_name)
+    def denied?(method_name)
       @none || @rule.include?(method_name)
     end
 
@@ -72,18 +72,18 @@ module RubySandbox
       @privileges
     end
 
-    # Specifies that a method or list of methods are disallowed
+    # Specifies that a method or list of methods are denied
     # Example
     #
     # rule = Rule.new
-    # rule.disallow :foo
-    # rule.disallow :foo, :bar
-    # rule.disallow :foo, :bar, :test
+    # rule.deny :foo
+    # rule.deny :foo, :bar
+    # rule.deny :foo, :bar, :test
     #
-    alias disallow add_rule
+    alias deny add_rule
 
-    # Specifies that all methods are disallowed
-    def disallow_all
+    # Specifies that all methods are denied
+    def deny_all
       @none = true
       tick
       @privileges

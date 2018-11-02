@@ -209,12 +209,12 @@ module RubySandbox
     # end
     #
     # class Y < X
-    #   def foo # disallowed
+    #   def foo # denied
     #   end
     # end
     #
     # X.new.foo # allowed
-    # Y.new.foo # disallowed: SecurityError
+    # Y.new.foo # denied: SecurityError
     # ...
     #
     def methods_of(klass)
