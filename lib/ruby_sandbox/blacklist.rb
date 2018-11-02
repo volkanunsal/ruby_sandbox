@@ -15,7 +15,6 @@ module RubySandbox
       rule_applies_to_method?(method_name)
     end
 
-    alias disallow_method add_method
     alias deny_method add_method
 
     def check_rule(rule, method_name)
@@ -23,7 +22,7 @@ module RubySandbox
     end
 
     def safe!
-      disallow_method :eval
+      deny_method :eval
     end
   end
 end
