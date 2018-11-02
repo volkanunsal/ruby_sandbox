@@ -58,7 +58,12 @@ module RubySandbox
       instance_variables.inject(0) do |s, v|
         rs = this.instance_variable_get(v)
         count = proc { |rule|
-          s = rule.num_rules + s
+          case rule
+          when Symbol
+            s += 1
+          else
+            s = rule.num_rules + s
+          end
         }
 
         case rs

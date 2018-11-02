@@ -238,8 +238,8 @@ module RubySandbox
       self
     end
 
-    def add_method(method_name)
-      @methods << method_name.to_sym
+    def add_method(*ms)
+      @methods += ms.map(&:to_sym)
       @methods.uniq!
       self
     end
