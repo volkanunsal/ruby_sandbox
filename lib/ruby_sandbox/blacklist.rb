@@ -12,7 +12,7 @@ module RubySandbox
       # TODO: add check for instance methods of
       # TODO: add check for klass of
       # TODO: add check for instance
-      rule_applies_to_method?(method_name)
+      on_method?(method_name)
     end
 
     alias deny_method add_method

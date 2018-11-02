@@ -5,11 +5,11 @@ module RubySandbox
   #
   class Whitelist < Permissions
     def allowed?(klass, recv, method_name)
-      rule_applies_to_method?(method_name) ||
-        rule_applies_to_method_on_obj?(recv, method_name) ||
-        rule_applies_to_instance_methods_of?(klass, method_name) ||
-        rule_applies_to_klass_or_superclasses_of?(klass, method_name) ||
-        rule_applies_to_instance_of?(recv, method_name)
+      on_method?(method_name) ||
+        on_receiver?(recv, method_name) ||
+        on_instance_of_klass?(klass, method_name) ||
+        on_superclass_of_klass?(klass, method_name) ||
+        on_instance_of_receiver_class?(recv, method_name)
     rescue StandardError => e
       print "ERROR: #{e}\n"
       print e.backtrace.join("\n")

@@ -3,17 +3,17 @@ module RubySandbox
   module RuleHelpers
     protected
 
-    def rule_applies_to_method?(method_name)
+    def on_method?(method_name)
       @methods.include?(method_name)
     end
 
-    def rule_applies_to_method_on_obj?(recv, method_name)
+    def on_receiver?(recv, method_name)
       id = recv.object_id
       rule = @objects[id]
       check_rule(rule, method_name)
     end
 
-    def rule_applies_to_instance_methods_of?(klass, method_name)
+    def on_instance_of_klass?(klass, method_name)
       # Find method in the instance methods of class.
       method = klass.instance_method(method_name) if method_name
       # Not found. Return nil.
@@ -29,23 +29,23 @@ module RubySandbox
     #
     # Is this supposed to receive a klass or a receiver?
     #
-    def rule_applies_to_klass_or_superclasses_of?(klass, method_name)
+    def on_superclass_of_klass?(klass, method_name)
       return unless klass.instance_of?(Class)
 
       loop do
-        return true if rule_applies_to_klass_of?(klass, method_name)
+        return true if on_klass_of?(klass, method_name)
         break if klass.nil? || klass == Object
 
         klass = klass.superclass
       end
     end
 
-    def rule_applies_to_klass_of?(klass, method_name)
+    def on_klass_of?(klass, method_name)
       rule = @classes[klass.object_id]
       check_rule(rule, method_name)
     end
 
-    def rule_applies_to_instance_of?(recv, method_name)
+    def on_instance_of_receiver_class?(recv, method_name)
       rule = @instances[recv.class.object_id]
       check_rule(rule, method_name)
     end
