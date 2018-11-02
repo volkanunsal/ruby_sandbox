@@ -6,8 +6,9 @@ RubySandbox is a configurable sandbox that ensures safe execution of untrusted R
 
 ```ruby
 # In your Gemfile
-gem 'ruby_sandbox', github: 'volkanunsal/ruby_sandbox'
+gem 'ruby_sandbox', github: 'volkanunsal/ruby_sandbox', tag: '0.6.1'
 ```
+
 ```
 $ bundle install
 ```
