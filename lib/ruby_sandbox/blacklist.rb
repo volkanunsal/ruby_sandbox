@@ -20,5 +20,10 @@ module RubySandbox
     def safe!
       deny_method :eval
     end
+
+    # TODO: test
+    def check_rule(rule, method_name)
+      rule && rule.denied?(method_name)
+    end
   end
 end

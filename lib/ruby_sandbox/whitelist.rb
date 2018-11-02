@@ -41,6 +41,11 @@ module RubySandbox
       allow_method 'core#define_method'.to_sym
     end
 
+    # TODO: test
+    def check_rule(rule, method_name)
+      rule && rule.allowed?(method_name)
+    end
+
     # Define singleton methods using instance methods of this class.
     class << self
       im = (RubySandbox::Whitelist.instance_methods - Object.instance_methods)
