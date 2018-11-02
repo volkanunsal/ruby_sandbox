@@ -1,13 +1,15 @@
 # RubySandbox - A secure sandbox for Ruby
 
-RubySandbox is a code sandbox for Ruby that ensures safe execution of untrusted Ruby code. It implements a Ruby interpreter in Ruby that provides APIs to allow user to hook into method calls while executing the code, and allow or deny a call by its class, instance of the receiver, name of the method or something else.
-
-The permissions for each sandboxed run is fully configurable and the implementation of the methods called from within the sandbox can be replaced transparently.
+RubySandbox is a configurable sandbox that ensures safe execution of untrusted Ruby code. It implements a Ruby interpreter that exposes hooks to allow a user to do things in response to method calls, such as allowing or denying a call by its class, instance of the receiver, name of the method or something else.
 
 ## Installation
 
+```ruby
+# In your Gemfile
+gem 'ruby_sandbox', github: 'volkanunsal/ruby_sandbox'
 ```
-sudo gem install ruby_sandbox
+```
+$ bundle install
 ```
 
 ## Usage
