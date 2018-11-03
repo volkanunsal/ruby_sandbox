@@ -225,15 +225,15 @@ module RubySandbox
     #
     # Example
     #   priv = RubySandbox.privileges
-    #   priv.rule { instances_of(Fixnum).allow_all }
+    #   priv.rule { |s| s.instances_of(Fixnum).allow_all }
     #
-    def rule(&blk)
-      num_rules_start = num_rules
-      instance_eval(&blk)
-      num_rules_end = num_rules
+    def rule
+      start = num_rules
+      yield self
+      finish = num_rules
 
       msg = 'No action specified on the subject in rule.'
-      raise ArgumentError, msg if num_rules_end == num_rules_start
+      raise ArgumentError, msg if finish == start
 
       self
     end
