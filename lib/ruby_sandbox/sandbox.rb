@@ -11,10 +11,8 @@ module RubySandbox
     attr_accessor :global_binding
   end
 
-  module Timeout
-    # raised when reach the timeout in a script execution restricted by timeout (see Sandbox#run)
-    class Error < RuntimeError
-    end
+  # raised when reach the timeout in a script execution restricted by timeout (see Sandbox#run)
+  class TimeoutError < RuntimeError
   end
 
   # rubocop:disable Metrics/ClassLength
@@ -29,22 +27,88 @@ module RubySandbox
   #
   # s.run(priv, 'print "hello world\n"')
   class Sandbox
-    # array of privileges of restricted code within sandbox
-    #
-    # Example
-    # sandbox.privileges[source].allow_method :raise
-    #
-    attr_reader :privileges
+    attr_reader :privileges, :base_namespace, :hook_handler, :chain
 
-    # Binding of execution, the default is a binding in a global context allowing the definition of module of classes
-    attr_reader :chain
-
-    attr_reader :hook_handler
+    def initialize
+      # Privileges of restricted code, indexed by source file location.
+      @privileges                  = {}
+      @hook_handler_list           = []
+      @chain                       = {}
+      @hook_handler                = instantiate_evalhook_handler
+      @hook_handler.sandbox        = self
+      @base_namespace              = create_adhoc_base_namespace
+      @hook_handler.base_namespace = @base_namespace
+    end
 
     # Run the code in sandbox with the given privileges
     #
-    #   (see examples)
+    # Example:
     #
+    #   sandbox = Sandbox.new
+    #   privileges = Whitelist.new
+    #   privileges.allow_method :print
+    #   sandbox.run('print "hello world\n"', privileges)
+    #
+    def run(*args)
+      opts = Argument.new(args)
+      t = build_timeout(opts)
+      b = build_binding(opts)
+      code, source = process_args(*args)
+
+      Timeout.timeout(t) do
+        hook_handler.evalhook(code, b, source)
+      end
+    rescue Timeout::Error
+      raise RubySandbox::TimeoutError
+    end
+
+    def build_timeout(opts)
+      t = opts.pick(:timeout) { nil }
+      raise ArgumentError, 'timeout cannot be zero.' if t == 0
+
+      t || 0
+    end
+
+    def build_binding(opts)
+      opts.pick(Binding, :binding) { RubySandbox.global_binding }
+    end
+
+    def wrap_code(code)
+      base_ns = @hook_handler.base_namespace
+      is_module = eval(base_ns.to_s).instance_of? Module
+      if is_module
+        "module #{base_ns}\n #{code}\n end\n"
+      else
+        "class #{base_ns}\n #{code}\n end\n"
+      end
+    end
+
+    # Creates a packet of code with the given privileges to execute later.
+    def packet(*args)
+      code, source, privileges_ = process_args(*args)
+      evalhook_packet = @hook_handler.packet(code)
+      RubySandbox::Packet.new(evalhook_packet, privileges_, source)
+    end
+
+    class Opts
+      attr_reader :privileges,
+                  :code,
+                  :base_namespace,
+                  :no_base_namespace,
+                  :encoding,
+                  :source
+
+      def initialize(*args)
+        opts                = Argument.new(args)
+        @privileges         = opts.pick(Permissions, :privileges) { Whitelist.new }
+        @code               = opts.pick(String, :code)
+        @base_namespace     = opts.pick(:base_namespace) { nil }
+        @no_base_namespace  = opts.pick(:no_base_namespace) { false }
+        @encoding           = opts.pick(:encoding) { nil }
+        @source             = opts.pick(:source) { nil }
+      end
+    end
+
     # Arguments
     #
     # :code       Mandatory argument of class String with the code to execute
@@ -65,7 +129,7 @@ module RubySandbox
     #
     # :timeout   Optional argument to restrict the execution time of the script
     #            to a given value in seconds. (Accepts integer and decimal values),
-    #            when timeout hits RubySandbox::Timeout::Error is raised.
+    #            when timeout hits RubySandbox::TimeoutError is raised.
     #
     # :base_namespace   Alternate module to contain all classes and constants
     #                   defined by the unprivileged code if not specified, by
@@ -78,142 +142,50 @@ module RubySandbox
     # :encoding  Specify the encoding of source (example: "utf-8"), the encoding
     #           also can be specified on header like a ruby normal source file.
     #
-    # The arguments can be passed in any order and using hash notation or not, examples:
+    # The arguments can be passed in any order and using hash notation or not:
     #
-    # sandbox.run code, privileges
-    # sandbox.run code, :privileges => privileges
-    # sandbox.run :code => code, :privileges => privileges
-    # sandbox.run code, privileges, binding
-    # sandbox.run binding, code, privileges
-    # #etc
-    # sandbox.run binding, code, privileges, :source => source
-    # sandbox.run binding, :code => code, :privileges => privileges, :source => source
+    #   sandbox.run code, privileges
+    #   sandbox.run code, privileges: privileges
+    #   sandbox.run code: code, privileges: privileges
+    #   sandbox.run code, privileges, binding
+    #   sandbox.run binding, code, privileges
+    #   sandbox.run binding, code, privileges, source: source
+    #   sandbox.run binding, code: code, privileges: privileges, source: source
     #
-    # Example:
-    #
-    # sandbox = Sandbox.new
-    # privileges = Whitelist.new
-    # privileges.allow_method :print
-    # sandbox.run('print "hello world\n"', :privileges => privileges)
-    #
-    # Example 2:
-    # sandbox = Sandbox.new
-    # privileges = Whitelist.new
-    # privileges.allow_method :print
-    # privileges.allow_method :singleton_method_added
-    #
-    # sandbox.run('
-    #   def self.foo
-    #     print "hello world\n"
-    #   end', :privileges => privileges)
-    #
-    def run(*args)
-      opts = Argument.new(args)
-      t = opts.pick(:timeout) { nil }
-      raise RubySandbox::Timeout::Error if t == 0
-
-      t ||= 0
-
-      if block_given?
-        yield
-      else
-        ::Timeout.timeout(t) { run_i(*args) }
-      end
-    rescue ::Timeout::Error
-      raise RubySandbox::Timeout::Error
+    def process_args(*args)
+      opts   = Opts.new(*args)
+      source = build_source(opts)
+      assign_privileges_to_source(source, opts)
+      assign_hook_handler(opts)
+      [build_code(opts), source, opts.privileges]
     end
 
-    def run_i(*args)
-      opts = Argument.new(args)
-      binding_ = opts.pick(Binding, :binding) { RubySandbox.global_binding }
-      code, hook_handler, source = prepare_code(*args)
-      hook_handler.evalhook(code, binding_, source)
+    def assign_privileges_to_source(source, opts)
+      privileges[source] = opts.privileges
     end
 
-    # TODO: test
-    def wrap_code(code, base_namespace)
-      is_module = eval(base_namespace.to_s).instance_of? Module
-      if is_module
-        "module #{base_namespace}\n #{code}\n end\n"
-      else
-        "class #{base_namespace}\n #{code}\n end\n"
-      end
+    def assign_hook_handler(opts)
+      base_ns       = opts.base_namespace
+      @hook_handler = inst_hook_handler(base_ns) if base_ns
     end
 
-    # Creates a packet of code with the given privileges to execute later as
-    # many times as neccessary
-    #
-    #   (see examples)
-    #
-    # Arguments
-    #
-    # :code             Mandatory argument of class String with the code to
-    #                   execute restricted in the sandbox
-    #
-    # :privileges       Optional argument of class RubySandbox::Sandbox::Whitelist
-    #                   to indicate the restrictions of the code executed in
-    #                   the sandbox. The default is an empty Whitelist (absolutely
-    #                   no permission.) Must be of class Whitelist or passed
-    #                   as hash_key (:privileges => privileges)
-    #
-    # :source           Optional argument to indicate the "source name",
-    #                   (visible in the backtraces). Only can be specified as
-    #                   hash parameter.
-    #
-    # :base_namespace   Alternate module to contain all classes and constants
-    #                   defined by the unprivileged code. If not specified, by
-    #                   default, the base_namespace is created with the sandbox
-    #                   itself.
-    #
-    # :no_base_namespace  Specify to do not use a base_namespace (default false,
-    #                     not recommended to change.)
-    #
-    # :encoding         Specify the encoding of source (example: "utf-8"), the
-    #                   encoding also can be specified on header like a ruby
-    #                   normal source file.
-    #
-    # NOTE: arguments are the same as for Sandbox#run method, except for timeout
-    # and binding which can be used when calling RubySandbox::Packet#run.
-    #
-    # Example:
-    #
-    # sandbox = Sandbox.new
-    #
-    # privileges = Whitelist.allow_method(:print)
-    #
-    # # this is equivallent to sandbox.run('print "hello world\n"')
-    # packet = sandbox.packet('print "hello world\n"', privileges)
-    # packet.run
-    #
-    def packet(*args)
-      code, _hook_handler, source, privileges_ = prepare_code(*args)
-      evalhook_packet = @hook_handler.packet(code)
-      RubySandbox::Packet.new(evalhook_packet, privileges_, source)
+    def build_encoding(opts)
+      opts.encoding || get_source_encoding(opts.code)
     end
 
-    # rubocop:disable Metrics/AbcSize
-    def prepare_code(*args)
-      opts = Argument.new(args)
-      privileges_ = opts.pick(Permissions, :privileges) { Whitelist.new }
-      code = opts.pick(String, :code)
-      base_namespace = opts.pick(:base_namespace) { nil }
-      no_base_namespace = opts.pick(:no_base_namespace) { @no_base_namespace }
-      encoding = get_source_encoding(code) || opts.pick(:encoding) { nil }
-      source = opts.pick(:source) { generate_id }
+    def build_source(opts)
+      opts.source || generate_id
+    end
 
-      hook_handler = @hook_handler
-      hook_handler = inst_hook_handler(base_namespace) if base_namespace
-      base_namespace = hook_handler.base_namespace
-
-      privileges[source] = privileges_
+    def build_code(opts)
+      code      = opts.code
+      encoding  = build_encoding(opts)
 
       code = "nil;\n " + code
-      code = wrap_code(code, base_namespace) unless no_base_namespace
+      code = wrap_code(code) unless opts.no_base_namespace
       code = "# encoding: #{encoding}\n" + code if encoding
-
-      [code, hook_handler, source, privileges_]
+      code
     end
-    # rubocop:enable Metrics/AbcSize
 
     def inst_hook_handler(base_namespace)
       hook_handler = instantiate_evalhook_handler
@@ -226,23 +198,6 @@ module RubySandbox
     def generate_id
       "sandbox-#{rand(1_000_000)}"
     end
-
-    def initialize
-      @privileges = {}
-      @chain = {}
-      @hook_handler_list = []
-      @hook_handler = instantiate_evalhook_handler
-      @hook_handler.sandbox = self
-      @base_namespace = create_adhoc_base_namespace
-      @hook_handler.base_namespace = @base_namespace
-    end
-
-    # add a chain of sources, used internally
-    def add_source_chain(outer, inner)
-      @chain[inner] = outer
-    end
-
-    attr_reader :base_namespace
 
     def create_hook_handler(*args)
       args = Argument.new(args)

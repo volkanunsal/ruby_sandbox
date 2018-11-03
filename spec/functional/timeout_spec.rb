@@ -1,31 +1,29 @@
 require 'spec_helper'
 
-include RubySandbox
+describe RubySandbox::Sandbox do
+  [
+    ['basic', 0.2, 0.1],
+    ['float', 0.2, 0.1],
+    ['float_no_hit', 0.1, 0.2],
+    ['zero', 0.1, 0],
+    ['zero_no_hit', 0, 1]
+    ].each do |name, execution_delay, timeout|
+      describe name do
+        let(:action) {
+          code = "sleep #{execution_delay}"
+          Sandbox.new.run code, priv, timeout: timeout
+        }
+        subject { -> { action } }
+        let(:priv) { RubySandbox::Whitelist.new }
+        before { priv.allow_method :sleep }
 
-describe Sandbox, 'RubySandbox sandbox' do
-  def self.add_test(name, execution_delay, timeout)
-    if execution_delay > timeout
-      it "Should allow timeout of type #{name}" do
-        priv = RubySandbox::Whitelist.new
-        priv.allow_method :sleep
-
-        expect do
-          Sandbox.new.run "sleep #{execution_delay}", priv, timeout: timeout
-        end.to raise_error(RubySandbox::Timeout::Error)
+        if timeout == 0
+          it { is_expected.to raise_error(ArgumentError) }
+        elsif execution_delay > timeout
+          it { is_expected.to raise_error(RubySandbox::TimeoutError) }
+        else
+          it { is_expected.to_not raise_error }
+        end
       end
-    else
-      it "Should allow timeout of type #{name}" do
-        priv = RubySandbox::Whitelist.new
-        priv.allow_method :sleep
-
-        Sandbox.new.run "sleep #{execution_delay}", priv, timeout: timeout
-      end
-    end
   end
-
-  add_test 'basic', 0.2, 0.1
-  add_test 'float', 0.2, 0.1
-  add_test 'float_no_hit', 0.1, 0.2
-  add_test 'zero', 0.1, 0
-  add_test 'zero_no_hit', 0, 1
 end

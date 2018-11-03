@@ -7,7 +7,7 @@ require 'ruby_sandbox/sandbox'
 
 # RubySandbox is a wrapper for Sandbox.
 module RubySandbox
-  extend self
+  module_function
 
   def new
     Sandbox.new

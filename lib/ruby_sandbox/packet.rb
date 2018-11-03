@@ -3,9 +3,9 @@ module RubySandbox
   #
   class Packet
     def initialize(evalhook_packet, default_privileges, source) #:nodoc:
-      @evalhook_packet = evalhook_packet
+      @evalhook_packet    = evalhook_packet
       @default_privileges = default_privileges
-      @source = source
+      @source             = source
     end
 
     # Run the code in the package
@@ -24,13 +24,13 @@ module RubySandbox
     def run(*args)
       args = Argument.new(args)
       t = args.pick(:timeout) { nil }
-      binding_ = args.pick(Binding, :binding) { nil }
+      b = args.pick(Binding, :binding) { nil }
 
-      ::Timeout.timeout t do
-        @evalhook_packet.run(binding_, @source, 0)
+      Timeout.timeout t do
+        @evalhook_packet.run(b, @source, 0)
       end
-    rescue ::Timeout::Error
-      raise RubySandbox::Timeout::Error
+    rescue Timeout::Error
+      raise RubySandbox::TimeoutError
     end
 
     # Dispose the objects associated with this code package

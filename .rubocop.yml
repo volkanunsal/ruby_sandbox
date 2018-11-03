@@ -22,3 +22,5 @@ Style/NumericPredicate:
   Enabled: false
 Style/EvalWithLocation:
   Enabled: false
+Style/Documentation:
+  Enabled: false
