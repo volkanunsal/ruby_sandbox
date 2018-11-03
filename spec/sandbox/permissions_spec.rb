@@ -8,13 +8,13 @@ describe 'RubySandbox::Permissions' do
 
     describe 'when action is given' do
       subject { apply_rule }
-      let(:blk) { proc { object(Fixnum).allow_all } }
+      let(:blk) { proc { |s| s.object(Fixnum).allow_all } }
       it { is_expected.to be_kind_of(Permissions) }
     end
 
     describe 'when action is NOT given' do
       subject { -> { apply_rule } }
-      let(:blk) { proc { object(Fixnum) } }
+      let(:blk) { proc { |s| s.object(Fixnum) } }
       it {
         msg = 'No action specified on the subject in rule.'
         is_expected.to raise_error(ArgumentError, msg)

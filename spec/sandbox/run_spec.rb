@@ -3,6 +3,7 @@ require 'spec_helper'
 include RubySandbox
 
 $top_level_binding = binding
+$VERBOSE = nil
 
 describe 'Sandbox#run' do
   describe 'empty code (with and without privileges)' do
@@ -35,7 +36,7 @@ describe 'Sandbox#run' do
       before  do
         allow(priv).to receive(:allowed?).and_return(true)
       end
-      it { is_expected.to_not raise_error(SecurityError) }
+      it { is_expected.to raise_error(NoMethodError) }
     end
   end
 
