@@ -3,7 +3,7 @@ require 'timeout'
 require 'ruby_sandbox/getsource'
 require 'ruby_sandbox/whitelist'
 require 'ruby_sandbox/eval_hook_handler'
-require 'ruby_sandbox/sandbox/packet'
+require 'ruby_sandbox/packet'
 
 # RubySandbox is the module namespace
 module RubySandbox
@@ -173,7 +173,7 @@ module RubySandbox
     #                   normal source file.
     #
     # NOTE: arguments are the same as for Sandbox#run method, except for timeout
-    # and binding which can be used when calling RubySandbox::Sandbox::Packet#run.
+    # and binding which can be used when calling RubySandbox::Packet#run.
     #
     # Example:
     #
@@ -188,7 +188,7 @@ module RubySandbox
     def packet(*args)
       code, _hook_handler, source, privileges_ = prepare_code(*args)
       evalhook_packet = @hook_handler.packet(code)
-      RubySandbox::Sandbox::Packet.new(evalhook_packet, privileges_, source)
+      RubySandbox::Packet.new(evalhook_packet, privileges_, source)
     end
 
     # rubocop:disable Metrics/AbcSize
