@@ -26,10 +26,7 @@ module RubySandbox
     end
 
     # TODO: test
-    #
-    # Is this supposed to receive a klass or a receiver?
-    #
-    def on_superclass_of_klass?(klass, method_name)
+    def on_ancestor_chain_of_klass?(klass, method_name)
       return unless klass.instance_of?(Class)
 
       loop do

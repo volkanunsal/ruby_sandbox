@@ -8,7 +8,7 @@ module RubySandbox
       on_method?(method_name) ||
         on_receiver?(recv, method_name) ||
         on_instance_of_klass?(klass, method_name) ||
-        on_superclass_of_klass?(klass, method_name) ||
+        on_ancestor_chain_of_klass?(klass, method_name) ||
         on_instance_of_receiver_class?(recv, method_name)
     rescue StandardError => e
       print "ERROR: #{e}\n"
