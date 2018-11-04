@@ -1,37 +1,28 @@
 class Method
   class Node
-    attr_reader :file
-    attr_reader :line
+    attr_reader :file, :line
 
-    def initialize(file_, line_)
-      @file = file_
-      @line = line_
+    def initialize(file, line)
+      @file = file
+      @line = line
     end
   end
 
-  begin
-    instance_method('body')
-  rescue StandardError
-    def body
-      if source_location
-        Method::Node.new(source_location[0], source_location[1])
-      else
-        Method::Node.new('', 0)
-      end
+  def body
+    if source_location
+      Method::Node.new(source_location[0], source_location[1])
+    else
+      Method::Node.new('', 0)
     end
   end
 end
 
 class UnboundMethod
-  begin
-    instance_method('body')
-  rescue StandardError
-    def body
-      if source_location
-        Method::Node.new(source_location[0], source_location[1])
-      else
-        Method::Node.new('', 0)
-      end
+  def body
+    if source_location
+      Method::Node.new(source_location[0], source_location[1])
+    else
+      Method::Node.new('', 0)
     end
   end
 end
