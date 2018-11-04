@@ -7,25 +7,18 @@ require 'ruby_sandbox/packet'
 
 # RubySandbox is the module namespace
 module RubySandbox
-  class << self
-    attr_accessor :global_binding
-  end
-
-  # raised when reach the timeout in a script execution restricted by timeout (see Sandbox#run)
-  class TimeoutError < RuntimeError
-  end
-
   # rubocop:disable Metrics/ClassLength
-  # The sandbox class runs the sandbox. Only one instance of sandbox can be defined
-  # per thread (each thread may have its own sandbox running.)
   #
-  #= Example
+  # Only one instance of sandbox can be defined per thread.
   #
-  # s = Sandbox.new
-  # priv = Whitelist.new
-  # priv.allow_method :print
+  # Example
   #
-  # s.run(priv, 'print "hello world\n"')
+  #   s = Sandbox.new
+  #   priv = Whitelist.new
+  #   priv.allow_method :print
+  #
+  #   s.run(priv, 'print "hello world\n"')
+  #
   class Sandbox
     attr_reader :privileges, :base_namespace, :hook_handler, :chain
 
@@ -237,5 +230,3 @@ module RubySandbox
   end
   # rubocop:enable Metrics/ClassLength
 end
-
-RubySandbox.global_binding = binding

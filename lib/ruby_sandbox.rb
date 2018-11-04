@@ -9,10 +9,14 @@ require 'ruby_sandbox/sandbox'
 # RubySandbox is a wrapper for Sandbox.
 module RubySandbox
   module_function
-
+  class << self
+    attr_accessor :global_binding
+  end
   Permissions = OldDsl::Permissions
   Whitelist = OldDsl::Whitelist
   Blacklist = OldDsl::Blacklist
+  # raised when reach the timeout in a script execution restricted by timeout.
+  TimeoutError = Class.new(RuntimeError)
 
   def new
     Sandbox.new
@@ -36,3 +40,5 @@ module RubySandbox
     end
   end
 end
+
+RubySandbox.global_binding = binding
