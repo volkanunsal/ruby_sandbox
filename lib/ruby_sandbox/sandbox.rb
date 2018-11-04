@@ -201,18 +201,12 @@ module RubySandbox
     end
 
     def create_hook_handler(*args)
-      args = Argument.new(args)
-
-      hook_handler = instantiate_evalhook_handler
-      hook_handler.sandbox = self
-      @base_namespace = args.pick(:base_namespace) { create_adhoc_base_namespace }
-      hook_handler.base_namespace = @base_namespace
-
-      source = args.pick(:source) { generate_id }
-      privileges_ = args.pick(Permissions, :privileges) { Whitelist.new }
-
-      privileges[source] = privileges_
-
+      args    = Argument.new(args)
+      source  = args.pick(:source) { generate_id }
+      priv    = args.pick(Permissions, :privileges) { Whitelist.new }
+      @base_namespace     = args.pick(:base_namespace) { create_adhoc_base_namespace }
+      hook_handler        = inst_hook_handler(@base_namespace)
+      privileges[source]  = priv
       hook_handler
     end
 
