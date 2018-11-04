@@ -1,13 +1,18 @@
+require 'ruby_sandbox/old_dsl'
 require 'ruby_sandbox/argument'
-require 'ruby_sandbox/permissions'
-require 'ruby_sandbox/whitelist'
-require 'ruby_sandbox/blacklist'
+require 'ruby_sandbox/old_dsl/permissions'
+require 'ruby_sandbox/old_dsl/whitelist'
+require 'ruby_sandbox/old_dsl/blacklist'
 require 'ruby_sandbox/version'
 require 'ruby_sandbox/sandbox'
 
 # RubySandbox is a wrapper for Sandbox.
 module RubySandbox
   module_function
+
+  Permissions = OldDsl::Permissions
+  Whitelist = OldDsl::Whitelist
+  Blacklist = OldDsl::Blacklist
 
   def new
     Sandbox.new

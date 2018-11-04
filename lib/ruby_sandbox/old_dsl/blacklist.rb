@@ -1,7 +1,7 @@
 module RubySandbox
   # Blacklist class provides methods to blacklist methods, classes
   # and class instances.
-  class Blacklist < Permissions
+  class OldDsl::Blacklist < OldDsl::Permissions
     def allowed?(*args)
       blacklisted?(*args) == false
     end

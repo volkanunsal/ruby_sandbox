@@ -2,7 +2,6 @@ require 'evalhook'
 require 'timeout'
 require 'securerandom'
 require 'ruby_sandbox/getsource'
-require 'ruby_sandbox/whitelist'
 require 'ruby_sandbox/eval_hook_handler'
 require 'ruby_sandbox/packet'
 

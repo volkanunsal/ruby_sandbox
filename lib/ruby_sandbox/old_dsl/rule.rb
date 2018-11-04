@@ -1,6 +1,6 @@
 module RubySandbox
   # Used in Whitelist to store information about specified method permissions
-  class Rule
+  class OldDsl::Rule
     attr_reader :num_rules
 
     def initialize(privileges = nil)
