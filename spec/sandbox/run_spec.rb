@@ -47,235 +47,216 @@ describe 'Sandbox#run' do
     end
   end
 
-  it 'should allow use a class declared inside' do
-    priv = Whitelist.new
-    priv.allow_method :new
-    Sandbox.new.run("
-      class ::TestInsideClass
+  describe do
+    let(:code) { '' }
+    let(:s) { Sandbox.new }
+    let(:priv) { Whitelist.new }
+    let(:action) { s.run(code, priv, opts) }
+    let(:opts) { {} }
+
+    describe 'class declarations' do
+      before do
+        priv.allow_method :new
+      end
+      subject { action }
+      let(:code) { "
+        class ::TestInsideClass
+          def foo
+            1
+          end
+        end
+
+        ::TestInsideClass.new.foo
+      " }
+      it { is_expected.to eq 1 }
+    end
+
+    describe 'use base namespace when the code uses colon3 node (2 levels)' do
+      let(:code) { '::B4' }
+      let(:opts) { { base_namespace: A4 } }
+      let(:priv) { nil }
+      subject { action }
+      it { is_expected.to eq A4::B4 }
+    end
+
+    describe 'change base namespace when classes are declared (2 levels)' do
+      let(:code) { "class ::X4
+                 def foo
+                  1
+                 end
+              end; ::X4.new.foo" }
+      let(:opts) { { base_namespace: A4 } }
+      let(:priv) { nil }
+      subject { action }
+      it { is_expected.to eq A4::X4.new.foo }
+    end
+
+    describe 'use base namespace when the code uses colon3 node (3 levels)' do
+      let(:code) { '::C4' }
+      let(:opts) { { binding: $top_level_binding, base_namespace: ::A4::B4 } }
+      let(:priv) { nil }
+      subject { action }
+      it { is_expected.to eq ::A4::B4::C4 }
+    end
+
+    describe 'change base namespace when classes are declared (3 levels)' do
+      let(:code) { "class ::X4
+                 def foo
+                  1
+                 end
+              end; ::X4.new.foo" }
+      let(:opts) { { binding: $top_level_binding, base_namespace: ::A4::B4 } }
+      let(:priv) { nil }
+      subject { action }
+      it { is_expected.to eq ::A4::B4::X4.new.foo }
+    end
+
+    describe 'change base namespace when classes are declared (3 levels)' do
+      let(:code) { 'a' }
+      let(:priv) { nil }
+      subject do
+        a = 5
+        s.run(code, { binding: binding, no_base_namespace: true })
+      end
+      it { is_expected.to eq 5 }
+    end
+
+    describe 'instance variables' do
+      class N
         def foo
+          @a = 5
+          Sandbox.new.run('@a', binding, no_base_namespace: true)
         end
       end
-
-      ::TestInsideClass.new.foo
-    ", priv)
-  end
-
-  it 'should use base namespace when the code uses colon3 node (2 levels)' do
-    expect(Sandbox.new.run('::B4', base_namespace: A4)).to be == A4::B4
-  end
-
-  it 'should change base namespace when classes are declared (2 levels)' do
-    code = "class ::X4
-               def foo
-               end
-            end"
-    Sandbox.new.run(code, base_namespace: A4)
-
-    A4::X4
-  end
-
-  it 'should use base namespace when the code uses colon3 node (3 levels)' do
-    expect(Sandbox.new.run('::C4',
-                           $top_level_binding, base_namespace: ::A4::B4)).to be == ::A4::B4::C4
-  end
-
-  it 'should change base namespace when classes are declared (3 levels)' do
-    code = "class ::X4
-               def foo
-               end
-            end"
-    Sandbox.new.run(code, $top_level_binding, base_namespace: ::A4::B4)
-    A4::B4::X4
-  end
-
-  it 'should reach local variables when current binding is used' do
-    a = 5
-    expect(Sandbox.new.run('a', binding, no_base_namespace: true)).to be == 5
-  end
-
-  class N
-    def foo
-      @a = 5
-      Sandbox.new.run('@a', binding, no_base_namespace: true)
+      let(:object) { N.new }
+      subject { object.foo }
+      it { is_expected.to eq 5 }
     end
-  end
 
-  it 'should allow reference to instance variables' do
-    expect(N.new.foo).to be == 5
-  end
+    describe 'create a default module for each sandbox' do
+      let(:code) { 'class X
+               def foo
+                  "foo inside sandbox"
+               end
+             end; X.new.foo' }
+      let(:priv) { nil }
+      subject { action }
+      it { is_expected.to eq s.base_namespace::X.new.foo }
+    end
 
-  it 'should create a default module for each sandbox' do
-    s = Sandbox.new
-    s.run('class X
-             def foo
-                "foo inside sandbox"
-             end
-           end')
-
-    x = s.base_namespace::X.new
-    expect(x.foo).to be == 'foo inside sandbox'
-  end
-
-  it 'should not allow xstr when no authorized' do
-    s = Sandbox.new
-    priv = Whitelist.new
-
-    expect do
-      s.run('%x[echo hello world]', priv)
-    end.to raise_error(SecurityError)
-  end
-
-  it 'should allow xstr when authorized' do
-    s = Sandbox.new
-    priv = Whitelist.new
-
-    priv.allow_xstr
-
-    expect do
-      s.run('%x[echo hello world]', priv)
-    end.to_not raise_error
-  end
-
-  it 'should not allow global variable read' do
-    s = Sandbox.new
-    priv = Whitelist.new
-
-    expect do
-      s.run('$a', priv)
-    end.to raise_error(SecurityError)
-  end
-
-  it 'should allow global variable read when authorized' do
-    s = Sandbox.new
-    priv = Whitelist.new
-
-    priv.allow_global_read(:$a)
-
-    expect do
-      s.run('$a', priv)
-    end.to_not raise_error
-  end
-
-  it 'should not allow constant variable read' do
-    s = Sandbox.new
-    priv = Whitelist.new
-
-    TESTCONSTANT9999 = 9999
-    expect do
-      s.run('TESTCONSTANT9999', priv)
-    end.to raise_error(SecurityError)
-  end
-
-  it 'should allow constant read when authorized' do
-    s = Sandbox.new
-    priv = Whitelist.new
-
-    priv.allow_const_read('TESTCONSTANT9998')
-    ::TESTCONSTANT9998 = 9998
-
-    expect do
-      expect(s.run('TESTCONSTANT9998', priv)).to be == 9998
-    end.to_not raise_error
-  end
-
-  it 'should allow read constant nested on classes when authorized' do
-    s = Sandbox.new
-    priv = Whitelist.new
-
-    priv.allow_const_read('Fixnum')
-    Fixnum::TESTCONSTANT9997 = 9997
-
-    expect do
-      expect(s.run('Fixnum::TESTCONSTANT9997', priv)).to be == 9997
-    end.to_not raise_error
-  end
-
-  it 'should not allow global variable write' do
-    s = Sandbox.new
-    priv = Whitelist.new
-
-    expect do
-      s.run('$a = 9', priv)
-    end.to raise_error(SecurityError)
-  end
-
-  it 'should allow global variable write when authorized' do
-    s = Sandbox.new
-    priv = Whitelist.new
-
-    priv.allow_global_write(:$a)
-
-    expect do
-      s.run('$a = 9', priv)
-    end.to_not raise_error
-  end
-
-  it 'should not allow constant write' do
-    s = Sandbox.new
-    priv = Whitelist.new
-
-    expect do
-      s.run('TESTCONSTANT9999 = 99991', priv)
-    end.to raise_error(SecurityError)
-  end
-
-  it 'should allow constant write when authorized' do
-    s = Sandbox.new
-    priv = Whitelist.new
-
-    priv.allow_const_write('TESTCONSTANT9998')
-
-    expect do
-      s.run('TESTCONSTANT9998 = 99981', priv)
-      expect(TESTCONSTANT9998).to be == 99_981
-    end.to_not raise_error
-  end
-
-  it 'should allow write constant nested on classes when authorized' do
-    s = Sandbox.new
-    priv = Whitelist.new
-
-    priv.allow_const_read('Fixnum')
-    priv.allow_const_write('Fixnum::TESTCONSTANT9997')
-
-    expect do
-      s.run('Fixnum::TESTCONSTANT9997 = 99971', priv)
-      expect(Fixnum::TESTCONSTANT9997).to be == 99_971
-    end.to_not raise_error
-  end
-
-  it 'should allow package of code' do
-    s = Sandbox.new
-
-    expect do
-      s.packet('print "hello world\n"')
-    end.to_not raise_error
-  end
-
-  def self.package_oracle(args1, args2)
-    it 'should allow and execute package of code' do
-      e1 = nil
-      e2 = nil
-      r1 = nil
-      r2 = nil
-
-      begin
-        s = Sandbox.new
-        r1 = s.run(*(args1 + args2))
-      rescue Exception => e
-        e1 = e
+    describe 'xstr' do
+      let(:code) { '%x[echo hello world]' }
+      subject { -> { action } }
+      describe 'authorized' do
+        before do
+          priv.allow_xstr
+        end
+        it { is_expected.to_not raise_error }
       end
 
-      begin
-        s = Sandbox.new
-        packet = s.packet(*args1)
-        r2 = packet.run(*args2)
-      rescue Exception => e
-        e2 = e
+      describe 'not authorized' do
+        it { is_expected.to raise_error(SecurityError) }
+      end
+    end
+
+    describe 'global variable read' do
+      let(:code) { '$a' }
+      subject { -> { action } }
+
+      describe 'not authorized' do
+        it { is_expected.to raise_error(SecurityError) }
       end
 
-      expect(e1).to be == e2
-      expect(r1).to be == r2
+      describe 'authorized' do
+        before do
+          priv.allow_global_read(:$a)
+        end
+        it { is_expected.to_not raise_error }
+      end
+    end
+
+    describe 'constant read' do
+      TESTCONSTANT9999 = 9999
+      Fixnum::TESTCONSTANT9997 = 9997
+      let(:code) { 'TESTCONSTANT9999' }
+
+      describe 'not authorized' do
+        subject { -> { action } }
+        it { is_expected.to raise_error(SecurityError) }
+      end
+
+      describe 'authorized' do
+        subject { action }
+        before { priv.allow_const_read('TESTCONSTANT9999') }
+        it { is_expected.to eq TESTCONSTANT9999 }
+
+        describe 'nested' do
+          let(:code) { 'Fixnum::TESTCONSTANT9997' }
+          before do
+            priv.allow_const_read('Fixnum')
+          end
+          it { is_expected.to eq Fixnum::TESTCONSTANT9997 }
+        end
+      end
+    end
+
+    describe 'global variable write' do
+      let(:code) { '$a = 9' }
+      subject { -> { action } }
+
+      describe 'not authorized' do
+        it { is_expected.to raise_error(SecurityError) }
+      end
+
+      describe 'authorized' do
+        before do
+          priv.allow_global_write(:$a)
+        end
+        it { is_expected.to_not raise_error }
+        describe '$a' do
+          subject { $a }
+          it { is_expected.to eq 9 }
+        end
+      end
+    end
+
+    describe 'constant write' do
+      let(:code) { 'TESTCONSTANT9999 = 99991' }
+
+      describe 'not authorized' do
+        subject { -> { action } }
+        it { is_expected.to raise_error(SecurityError) }
+      end
+
+      describe 'authorized' do
+        before do
+          priv.allow_const_write('TESTCONSTANT9999')
+        end
+        subject { action }
+        it { is_expected.to eq 99991 }
+
+        describe TESTCONSTANT9999 do
+          it { is_expected.to eq 99991 }
+        end
+
+        describe 'nested' do
+          before do
+            priv.allow_const_read('Fixnum')
+            priv.allow_const_write('Fixnum::TESTCONSTANT9997')
+          end
+          let(:code) { 'Fixnum::TESTCONSTANT9997 = 99971' }
+          describe Fixnum::TESTCONSTANT9997 do
+            it { is_expected.to eq 99_971 }
+          end
+        end
+      end
+    end
+
+    describe 'package' do
+      let(:code) { 'print "hello world\n"' }
+      let(:action) { s.packet('print "hello world\n"') }
+      subject { -> { action } }
+      it { is_expected.to_not raise_error }
     end
   end
 
@@ -283,31 +264,62 @@ describe 'Sandbox#run' do
     def foo; end
   end
 
-  package_oracle ['1'], [binding: binding]
-  package_oracle ['1+1', { privileges: Whitelist.allow_method(:+) }], [binding: binding]
+  [
+    [['1'], [binding: binding]],
+    [['1+1', { privileges: Whitelist.new.allow_method(:+) }], [binding: binding]]
+  ].each do |args1, args2|
+    describe 'allow and execute package of code' do
+      begin
+        sandbox_instance = Sandbox.new.run(*(args1 + args2))
+      rescue Exception => e
+        sandbox_error = e
+      end
 
-  it 'should accept references to classes defined on previous run' do
-    sandbox = Sandbox.new
+      begin
+        packet_instance = Sandbox.new.packet(*args1).run(*args2)
+      rescue Exception => e
+        packet_error = e
+      end
 
-    sandbox.run("class XinsideSandbox
-    end")
+      describe 'sandbox_error' do
+        subject { sandbox_error }
+        it { is_expected.to eq packet_error }
+      end
 
-    expect(sandbox.run('XinsideSandbox')).to be == sandbox.base_namespace::XinsideSandbox
-  end
-
-  class OutsideX44
-    def method_missing(name)
-      name
+      describe 'sandbox_instance' do
+        subject { sandbox_instance }
+        it { is_expected.to eq packet_instance }
+      end
     end
   end
-  OutsideX44_ins = OutsideX44.new
 
-  it 'should allow method_missing handling' do
-    sandbox = Sandbox.new
-    privileges = Whitelist.new
-    privileges.allow_const_read('OutsideX44_ins')
-    privileges.instances_of(OutsideX44).allow :method_missing
+  describe 'references to classes defined on previous run' do
+    let(:code) { "class XinsideSandbox
+        def foo
+          1
+        end
+      end" }
+    let(:s) { Sandbox.new }
+    subject { s.run(code); s.run('XinsideSandbox') }
+    it { is_expected.to eq s.base_namespace::XinsideSandbox }
+  end
 
-    expect(sandbox.run('OutsideX44_ins.foo', privileges)).to be == :foo
+  describe 'method missing' do
+    class OutsideX44
+      def method_missing(name)
+        name
+      end
+    end
+    OutsideX44_ins = OutsideX44.new
+
+    let(:s) { Sandbox.new }
+    let(:priv) { Whitelist.new }
+    before do
+      priv.allow_const_read('OutsideX44_ins')
+      priv.instances_of(OutsideX44).allow :method_missing
+    end
+    let(:code) { 'OutsideX44_ins.foo' }
+    subject { s.run(code, priv) }
+    it { is_expected.to eq :foo }
   end
 end

@@ -95,6 +95,7 @@ module RubySandbox
     end
 
     def handle_loop(source, dest_source, klass, recv, method_name)
+      return if klass == Class
       privileges = sandbox.privileges[source]
       while privileges && (source != dest_source)
         msg = "Cannot invoke method #{method_name} on object of class #{klass}"
