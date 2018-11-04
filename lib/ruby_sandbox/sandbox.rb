@@ -1,5 +1,6 @@
 require 'evalhook'
 require 'timeout'
+require 'securerandom'
 require 'ruby_sandbox/getsource'
 require 'ruby_sandbox/whitelist'
 require 'ruby_sandbox/eval_hook_handler'
@@ -196,7 +197,7 @@ module RubySandbox
 
     # Generate a random source file name for the sandbox, used internally
     def generate_id
-      "sandbox-#{rand(1_000_000)}"
+      "sandbox-#{SecureRandom.hex.slice(1, 10)}"
     end
 
     def create_hook_handler(*args)
@@ -228,7 +229,7 @@ module RubySandbox
     end
 
     def create_adhoc_base_namespace
-      rnd_module_name = "SandboxBasenamespace#{rand(100_000_000)}"
+      rnd_module_name = "SandboxBasenamespace#{SecureRandom.hex.slice(1, 8)}"
 
       eval("module RubySandbox::Sandbox::#{rnd_module_name}; end")
       @base_namespace = eval("RubySandbox::Sandbox::#{rnd_module_name}")
