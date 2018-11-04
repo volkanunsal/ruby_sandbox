@@ -1,38 +1,25 @@
 require 'spec_helper'
 
-include RubySandbox
+describe RubySandbox::Sandbox do
+  tbl = [
+    ["# encoding: utf-8\n'кириллица'", {}, 'кириллица'],
+    ["'кириллица'", { encoding: 'utf-8' }, 'кириллица'],
+    ["# encoding:        utf-8\n'кириллица'", {}, 'кириллица'],
+    ["#        encoding: utf-8\n'кириллица'" , {}, 'кириллица']
+  ]
+  let(:inst) { described_class.new }
 
-describe Sandbox, 'RubySandbox sandbox' do
+  tbl.each do |input, opts, output|
+    describe input do
+      describe 'run' do
+        subject { inst.run(input, opts) }
+        it { is_expected.to eq output }
+      end
 
-  it 'should accept UTF-8 encoding via ruby header comments' do
-    expect(Sandbox.new.run("# encoding: utf-8\n'кириллица'")).to be == 'кириллица'
-  end
-
-  it 'should accept UTF-8 encoding via sandbox run options' do
-    expect(Sandbox.new.run("'кириллица'", encoding: 'utf-8')).to be == 'кириллица'
-  end
-
-  it 'should accept UTF-8 encoding via ruby header comments' do
-    expect(Sandbox.new.run("# encoding:        utf-8\n'кириллица'")).to be == 'кириллица'
-  end
-
-  it 'should accept UTF-8 encoding via ruby header comments' do
-    expect(Sandbox.new.run("#        encoding: utf-8\n'кириллица'")).to be == 'кириллица'
-  end
-
-  it 'should accept UTF-8 encoding via ruby header comments' do
-    expect(Sandbox.new.packet("# encoding: utf-8\n'кириллица'").run).to be == 'кириллица'
-  end
-
-  it 'should accept UTF-8 encoding via sandbox run options' do
-    expect(Sandbox.new.packet("'кириллица'", encoding: 'utf-8').run).to be == 'кириллица'
-  end
-
-  it 'should accept UTF-8 encoding via ruby header comments' do
-    expect(Sandbox.new.packet("# encoding:        utf-8\n'кириллица'").run).to be == 'кириллица'
-  end
-
-  it 'should accept UTF-8 encoding via ruby header comments' do
-    expect(Sandbox.new.packet("#        encoding: utf-8\n'кириллица'").run).to be == 'кириллица'
+      describe 'packet' do
+        subject { inst.packet(input, opts).run }
+        it { is_expected.to eq output }
+      end
+    end
   end
 end
