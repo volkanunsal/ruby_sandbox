@@ -1,14 +1,14 @@
 require 'find'
-require 'ruby_sandbox/old_dsl/rule'
-require 'ruby_sandbox/old_dsl/rule_helpers'
+require 'ruby_sandbox/dsl/rule'
+require 'ruby_sandbox/dsl/rule_helpers'
 
 # rubocop:disable_line Style/Documentation
 module RubySandbox
   #
   # The Permissions class represent permissions about methods and objects
   #
-  class OldDsl::Permissions
-    include OldDsl::RuleHelpers
+  class Dsl::Permissions
+    include Dsl::RuleHelpers
 
     def initialize
       @readable_globals = []

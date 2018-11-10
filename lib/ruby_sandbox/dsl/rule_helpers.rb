@@ -1,6 +1,6 @@
 module RubySandbox
   # rubocop:disable_line Style/Documentation
-  module OldDsl::RuleHelpers
+  module Dsl::RuleHelpers
     protected
 
     def on_method?(method_name)
@@ -77,7 +77,7 @@ module RubySandbox
     def build_rule(hash, key)
       rule = hash[key]
       unless rule
-        rule = OldDsl::Rule.new(self)
+        rule = Dsl::Rule.new(self)
         hash[key] = rule
       end
       rule

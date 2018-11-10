@@ -1,8 +1,8 @@
-require 'ruby_sandbox/old_dsl'
+require 'ruby_sandbox/dsl'
 require 'ruby_sandbox/argument'
-require 'ruby_sandbox/old_dsl/permissions'
-require 'ruby_sandbox/old_dsl/whitelist'
-require 'ruby_sandbox/old_dsl/blacklist'
+require 'ruby_sandbox/dsl/permissions'
+require 'ruby_sandbox/dsl/whitelist'
+require 'ruby_sandbox/dsl/blacklist'
 require 'ruby_sandbox/version'
 require 'ruby_sandbox/sandbox'
 
@@ -12,9 +12,9 @@ module RubySandbox
   class << self
     attr_accessor :global_binding
   end
-  Permissions = OldDsl::Permissions
-  Whitelist = OldDsl::Whitelist
-  Blacklist = OldDsl::Blacklist
+  Permissions = Dsl::Permissions
+  Whitelist = Dsl::Whitelist
+  Blacklist = Dsl::Blacklist
   # raised when reach the timeout in a script execution restricted by timeout.
   TimeoutError = Class.new(RuntimeError)
 

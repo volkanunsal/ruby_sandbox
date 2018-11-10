@@ -3,7 +3,7 @@ module RubySandbox
   # Whitelist class provides methods to whitelist methods, classes
   # and class instances.
   #
-  class OldDsl::Whitelist < OldDsl::Permissions
+  class Dsl::Whitelist < Dsl::Permissions
     def allowed?(klass, recv, method_name)
       on_method?(method_name) ||
         on_receiver?(recv, method_name) ||

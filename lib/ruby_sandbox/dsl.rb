@@ -1,4 +1,4 @@
 module RubySandbox
-  module OldDsl
+  module Dsl
   end
 end
