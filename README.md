@@ -44,7 +44,7 @@ TODO
 
 ## Credit
 
-RubySandbox is based on [shikashi](http://github.com/tario) by [tario](http://.github.com/tario).
+RubySandbox is based on [shikashi](https://github.com/tario/shikashi) by [tario](http://github.com/tario).
 
 ## Copyright
 
